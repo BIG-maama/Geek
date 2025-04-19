@@ -1,0 +1,20 @@
+flutter_native_splash:
+  color: "#ffffff"
+  color_dark: "#000000"
+  image: images/splash_screen-Photoroom.png
+  image_dark: images/splash_screen-Photoroom.png
+  fullscreen: true
+  android: true
+  
+
+  
+  
+  android_12:
+    color: "#ffffff"
+    color_dark: "#000000"
+    image: images/splash_screen-Photoroom.png
+    image_dark: images/splash_screen-Photoroom.png
+    fullscreen: true
+    
+    
+
