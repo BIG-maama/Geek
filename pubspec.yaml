@@ -63,6 +63,11 @@ flutter:
   assets:
    - images/splash_screen.png
    - images/splash_screen-Photoroom.png
+   - images/google.png
+   - images/email.png
+   - images/back.png
+   - images/email2.jpg
+   - images/lock (1).jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

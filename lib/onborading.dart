@@ -22,10 +22,7 @@ class SkipScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: screenWidth * 0.01,
-                vertical: screenHeight * 0.01,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: 3, vertical: 3),
               decoration: BoxDecoration(
                 color: const Color(0xFF06DE87),
                 borderRadius: BorderRadius.circular(10),
