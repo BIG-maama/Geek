@@ -1,10 +1,13 @@
 import 'dart:convert';
 
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:pro/constant_color.dart';
 import 'package:pro/home.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -14,13 +17,12 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  bool _obscurePassword = true;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   Future<void> sign_in() async {
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://192.168.1.3:8000/api/login-user'),
+      Uri.parse('http://192.168.1.5:8000/api/login-user'),
     );
     request.fields['email'] = _emailController.text.trim();
     request.fields['password'] = _passwordController.text.trim();
@@ -30,6 +32,34 @@ class _LoginScreenState extends State<LoginScreen> {
     if (response.statusCode == 200) {
       var responseData = await response.stream.bytesToString();
       final data = jsonDecode(responseData);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('تمت العملية بنجاح'),
+          duration: Duration(seconds: 2),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      );
+      // showTopSnackBar(
+      //   Overlay.of(context),
+      //   CustomSnackBar.success(message: "نجاح!"),
+      // );
+      // final snackBar = SnackBar(
+      //   elevation: 0,
+      //   behavior: SnackBarBehavior.floating,
+      //   backgroundColor: Colors.transparent,
+      //   content: AwesomeSnackbarContent(
+      //     title: 'نجاح!',
+      //     message: 'تم تنفيذ العملية بنجاح تام 🎉',
+      //     contentType: ContentType.success,
+      //   ),
+      // );
+      // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+      print("sucssess pro");
       Navigator.push(context, MaterialPageRoute(builder: (_) => king()));
     }
   }
@@ -62,7 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   const SizedBox(height: 67.0),
-                  // Close button
+
                   GestureDetector(
                     onTap: () => Navigator.of(context).pop(),
                     child: Image.asset(
@@ -75,7 +105,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const SizedBox(height: 24.0),
 
-                  // Welcome text
                   const Text(
                     'مرحبا بك في تطبيق دواء.',
                     style: TextStyle(
@@ -89,7 +118,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const SizedBox(height: 12.0),
 
-                  // Subtitle
                   const Text(
                     'التسجيل من خلال الايميل',
                     style: TextStyle(
@@ -168,7 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Row(
                       children: [
                         Icon(Icons.lock, size: 21.0, color: AppColors.hintText),
-                        //   ),
+
                         Expanded(
                           child: TextFormField(
                             cursorColor: const Color.fromARGB(
@@ -203,7 +231,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const SizedBox(height: 18.0),
 
-                  // Login button
                   Center(
                     child: SizedBox(
                       width: 291.0,
@@ -233,7 +260,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
 
-                  // Add additional space at the bottom to match design
                   const SizedBox(height: 442.0),
                 ],
               ),
