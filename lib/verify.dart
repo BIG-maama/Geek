@@ -1,5 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:pro/home.dart';
+import 'package:pro/widget/token.dart';
 
 class VerificationCodeScreen extends StatefulWidget {
   const VerificationCodeScreen({Key? key}) : super(key: key);
@@ -9,6 +14,75 @@ class VerificationCodeScreen extends StatefulWidget {
 }
 
 class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
+  Future<void> verify() async {
+    try {
+      final token = await tokenManager.getToken();
+
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('http://192.168.1.105:8000/api/verify-email-code'),
+      );
+
+      request.headers['Authorization'] = 'Bearer $token';
+      request.fields['verification_code'] = _codeController.text;
+      request.fields['email'] = _emailcontroller.text;
+
+      var response = await request.send();
+      var responseData = await response.stream.bytesToString();
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(responseData);
+        final showmessage = data['message'] ?? 'تم التحقق بنجاح';
+
+        final snackBar = SnackBar(
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            title: 'نجاح!',
+            message: showmessage,
+            contentType: ContentType.success,
+          ),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        print("Success: $showmessage");
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => king()),
+        );
+      } else {
+        final data = jsonDecode(responseData);
+        final errorMessage = data['message'] ?? 'حدث خطأ غير متوقع';
+
+        final snackBar = SnackBar(
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            title: 'خطأ!',
+            message: errorMessage,
+            contentType: ContentType.failure,
+          ),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        print("Error ${response.statusCode}: $errorMessage");
+      }
+    } catch (e) {
+      final snackBar = SnackBar(
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          title: 'استثناء!',
+          message: 'حدث خطأ أثناء التحقق: $e',
+          contentType: ContentType.failure,
+        ),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      print("Exception: $e");
+    }
+  }
+
   bool isButtonEnabled = false;
 
   void _validateInputs() {
@@ -29,7 +103,6 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
   void initState() {
     super.initState();
     _startTimer();
-
     _codeController.addListener(_validateInputs);
     _emailcontroller.addListener(_validateInputs);
   }
@@ -134,9 +207,9 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
                             cursorColor: Colors.teal,
                             controller: _codeController,
                             textAlign: TextAlign.center,
-                            keyboardType: TextInputType.number,
+                            keyboardType: TextInputType.text,
                             style: const TextStyle(
-                              color: Color(0xFFC2C2C2),
+                              color: Colors.teal,
                               fontFamily: 'Almarai',
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -182,7 +255,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
                             textAlign: TextAlign.center,
                             keyboardType: TextInputType.emailAddress,
                             style: const TextStyle(
-                              color: Color(0xFFC2C2C2),
+                              color: Colors.teal,
                               fontFamily: 'Almarai',
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -207,6 +280,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
                         onTap:
                             isButtonEnabled
                                 ? () {
+                                  verify();
                                   print("تم التأكيد");
                                 }
                                 : null,
