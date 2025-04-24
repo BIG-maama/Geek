@@ -3,7 +3,8 @@ import 'dart:convert';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:pro/home.dart';
+import 'package:pro/first/home.dart';
+import 'package:pro/widget/constant_url.dart';
 import 'package:pro/widget/token.dart';
 
 class VerificationCodeScreen extends StatefulWidget {
@@ -20,7 +21,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
 
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('http://192.168.1.105:8000/api/verify-email-code'),
+        Uri.parse('$baseUrl/api/verify-email-code'),
       );
 
       request.headers['Authorization'] = 'Bearer $token';

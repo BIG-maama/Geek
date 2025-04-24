@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pro/start.dart';
+import 'package:pro/first/start.dart';
 
 class SkipScreen extends StatelessWidget {
   const SkipScreen({Key? key}) : super(key: key);

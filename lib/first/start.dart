@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pro/first/Rigster.dart';
 import 'package:pro/login_page.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -56,7 +57,7 @@ class WelcomeScreen extends StatelessWidget {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => LoginScreen()),
+                          MaterialPageRoute(builder: (_) => PersonalInfoForm()),
                         );
                       },
                       child: Row(

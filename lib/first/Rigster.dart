@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:pro/verify.dart';
+import 'package:pro/first/verify.dart';
+
+import 'package:pro/widget/constant_url.dart';
 import 'package:pro/widget/custom_text.dart';
 import 'package:pro/widget/token.dart';
 
@@ -33,7 +35,7 @@ class _PersonalInfoFormState extends State<PersonalInfoForm> {
   Future<void> registerUser() async {
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://192.168.1.105:8000/api/register-user'),
+      Uri.parse('$baseUrl/api/register-user'),
     );
 
     request.fields['name'] = _nameController.text;
@@ -49,7 +51,7 @@ class _PersonalInfoFormState extends State<PersonalInfoForm> {
       var responseData = await response.stream.bytesToString();
       final data = jsonDecode(responseData);
       final token = data['token'];
-      print(token);
+
       await tokenManager.saveToken(token);
       final snackBar = SnackBar(
         elevation: 0,
