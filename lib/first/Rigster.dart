@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:pro/first/verify.dart';
 
 import 'package:pro/widget/constant_url.dart';
+import 'package:pro/widget/custom_radio.dart';
 import 'package:pro/widget/custom_text.dart';
 import 'package:pro/widget/token.dart';
 
@@ -33,6 +34,7 @@ class _PersonalInfoFormState extends State<PersonalInfoForm> {
   }
 
   Future<void> registerUser() async {
+    gendercontroller.text = _selectedGender;
     var request = http.MultipartRequest(
       'POST',
       Uri.parse('$baseUrl/api/register-user'),
@@ -82,7 +84,7 @@ class _PersonalInfoFormState extends State<PersonalInfoForm> {
 
   bool _passwordVisible = false;
   bool _confirmPasswordVisible = false;
-  String _selectedGender = 'male'; // Default selection
+  String _selectedGender = 'male';
 
   void _togglePasswordVisibility() {
     setState(() {
@@ -94,16 +96,6 @@ class _PersonalInfoFormState extends State<PersonalInfoForm> {
     setState(() {
       _confirmPasswordVisible = !_confirmPasswordVisible;
     });
-  }
-
-  void _submitForm() {
-    // Form submission logic would go here
-    print('Form submitted');
-    print('Phone: ${_phoneController.text}');
-    print('Name: ${_nameController.text}');
-    print('Email: ${_emailController.text}');
-    print('Password: ${_passwordController.text}');
-    print('Gender: $_selectedGender');
   }
 
   @override
@@ -225,60 +217,49 @@ class _PersonalInfoFormState extends State<PersonalInfoForm> {
 
                         const SizedBox(height: 20),
 
-                        CustomTextField(
-                          label: ' الجنس :',
-                          placeholder: ' ادخل جنسك ',
-                          controller: gendercontroller,
-                          keyboardType: TextInputType.text,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'النوع:',
+                              style: TextStyle(
+                                fontFamily: 'Almarai',
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.black,
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                CustomRadioButton(
+                                  label: 'ذكر',
+                                  isSelected: _selectedGender == 'male',
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedGender = 'male';
+                                    });
+                                  },
+                                ),
+                                CustomRadioButton(
+                                  label: 'انثى',
+                                  isSelected: _selectedGender == 'female',
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedGender = 'female';
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-
-                        // Gender selection
-                        // Column(
-                        //   crossAxisAlignment: CrossAxisAlignment.start,
-                        //   children: [
-                        //     const Text(
-                        //       'النوع:',
-                        //       style: TextStyle(
-                        //         fontFamily: 'Almarai',
-                        //         fontSize: 13,
-                        //         fontWeight: FontWeight.w700,
-                        //         color: Colors.black,
-                        //       ),
-                        //     ),
-                        //     const SizedBox(height: 5),
-                        //     Row(
-                        //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        //       children: [
-                        //         CustomRadioButton(
-                        //           label: 'ذكر',
-                        //           isSelected: _selectedGender == 'male',
-                        //           onTap: () {
-                        //             setState(() {
-                        //               _selectedGender = 'male';
-                        //             });
-                        //           },
-                        //         ),
-                        //         CustomRadioButton(
-                        //           label: 'انثى',
-                        //           isSelected: _selectedGender == 'female',
-                        //           onTap: () {
-                        //             setState(() {
-                        //               _selectedGender = 'female';
-                        //             });
-                        //           },
-                        //         ),
-                        //       ],
-                        //     ),
-                        //   ],
-                        // ),
                       ],
                     ),
                   ),
 
                   const SizedBox(height: 40),
-
-                  // Confirm button
-                  // Confirm button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(

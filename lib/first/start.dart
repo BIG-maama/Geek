@@ -1,9 +1,47 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:pro/first/Rigster.dart';
-import 'package:pro/login_page.dart';
+import 'package:pro/widget/token.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class WelcomeScreen extends StatelessWidget {
+class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({Key? key}) : super(key: key);
+  @override
+  State<WelcomeScreen> createState() => _WelcomeScreen();
+}
+
+class _WelcomeScreen extends State<WelcomeScreen> {
+  String? _token;
+  String? _errorMessage;
+
+  Future<void> _signInWithGoogle() async {
+    final url = "http://192.168.1.9:8000/api/auth/google";
+    try {
+      if (await canLaunch(url)) {
+        await launch(url); // فتح واجهة Google OAuth
+        // بعد اختيار الحساب، توقع الرد من API الثانية
+        final callbackUrl = "http://192.168.1.9:8000/api/auth/google/callback";
+        final response = await http.get(Uri.parse(callbackUrl));
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+
+          setState(() {
+            _token = data['token'];
+            _errorMessage = null;
+          });
+          await tokenManager.saveToken(_token!);
+          print("sucsses");
+        } else {
+          print(_errorMessage = "Error: ${response.body}");
+        }
+      } else {
+        print(_errorMessage = "Cannot launch URL. Check your configuration.");
+      }
+    } catch (e) {
+      print(_errorMessage = "Error: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +133,9 @@ class WelcomeScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () async {
+                        await _signInWithGoogle();
+                      },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         mainAxisSize: MainAxisSize.min,
@@ -142,3 +182,40 @@ class WelcomeScreen extends StatelessWidget {
     );
   }
 }
+
+
+
+
+
+
+
+
+ // static const String _googleLoginUrl =
+  //     "http://192.168.1.9:8000/api/auth/google";
+  // static const String _callbackUrlScheme = "com.example.pro";
+
+  // static Future<void> signInWithGoogle(BuildContext context) async {
+  //   try {
+  //     // 1. فتح صفحة تسجيل الدخول
+  //     final result = await FlutterWebAuth2.authenticate(
+  //       url: _googleLoginUrl,
+  //       callbackUrlScheme: _callbackUrlScheme,
+  //     );
+
+  //     // 2. استخراج الـ token من الرابط العائد
+  //     final token = Uri.parse(result).queryParameters['token'];
+
+  //     if (token != null) {
+  //       // 3. حفظ التوكن
+  //       await tokenManager.saveToken(token);
+  //       print("تم حفظ التوكن: $token");
+
+  //       // 4. الانتقال إلى الصفحة الرئيسية
+  //       Navigator.pushReplacementNamed(context, '/home');
+  //     } else {
+  //       throw Exception('لم يتم العثور على التوكن في الرابط العائد');
+  //     }
+  //   } catch (e) {
+  //     print('خطأ أثناء تسجيل الدخول عبر جوجل: $e');
+  //   }
+  // }
