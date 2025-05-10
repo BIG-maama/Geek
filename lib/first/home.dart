@@ -3,9 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pro/first/login_page.dart';
 import 'package:pro/widget/constant_url.dart';
+import 'package:pro/widget/profile.dart';
 import 'package:pro/widget/token.dart';
 
-class king extends StatelessWidget {
+class king extends StatefulWidget {
+  const king({Key? key}) : super(key: key);
+  @override
+  State<king> createState() => _king();
+}
+
+class _king extends State<king> {
   Future<void> logout(BuildContext context) async {
     final token = await tokenManager.getToken();
 
@@ -53,6 +60,41 @@ class king extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              DrawerHeader(
+                decoration: BoxDecoration(color: Colors.green.shade100),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "name : ${UserData.currentUser!.name}",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      "email : ${UserData.currentUser!.email}",
+                      style: TextStyle(fontSize: 14),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      "phone : ${UserData.currentUser!.phone}",
+                      style: TextStyle(fontSize: 14),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      "gender : ${UserData.currentUser!.gender}",
+                      style: TextStyle(fontSize: 14),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      "created_at : ${UserData.currentUser!.date}",
+                      style: TextStyle(fontSize: 14),
+                    ),
+                  ],
+                ),
+              ),
               Container(
                 padding: EdgeInsets.all(29),
                 child: Wrap(
@@ -63,27 +105,9 @@ class king extends StatelessWidget {
                       title: Text("home"),
                       onTap: () {},
                     ),
-                    ListTile(
-                      leading: Icon(Icons.favorite_border),
-                      title: Text("favoites"),
-                      onTap: () {},
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.workspaces_outline),
-                      title: Text("workflow"),
-                      onTap: () {},
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.update),
-                      title: Text("updates"),
-                      onTap: () {},
-                    ),
+
                     Divider(),
-                    ListTile(
-                      leading: Icon(Icons.account_tree_outlined),
-                      title: Text("plugins"),
-                      onTap: () {},
-                    ),
+
                     ListTile(
                       leading: Icon(Icons.logout_outlined),
                       title: Text("log out"),

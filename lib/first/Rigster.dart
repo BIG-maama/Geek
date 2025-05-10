@@ -1,13 +1,12 @@
 import 'dart:convert';
-
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pro/first/verify.dart';
-
 import 'package:pro/widget/constant_url.dart';
 import 'package:pro/widget/custom_radio.dart';
 import 'package:pro/widget/custom_text.dart';
+import 'package:pro/widget/profile.dart';
 import 'package:pro/widget/token.dart';
 
 class PersonalInfoForm extends StatefulWidget {
@@ -18,6 +17,8 @@ class PersonalInfoForm extends StatefulWidget {
 }
 
 class _PersonalInfoFormState extends State<PersonalInfoForm> {
+  UserModel? currentUser;
+
   @override
   void initState() {
     super.initState();
@@ -53,6 +54,7 @@ class _PersonalInfoFormState extends State<PersonalInfoForm> {
       var responseData = await response.stream.bytesToString();
       final data = jsonDecode(responseData);
       final token = data['token'];
+      UserData.currentUser = UserModel.fromJson(data['user']);
 
       await tokenManager.saveToken(token);
       final snackBar = SnackBar(
@@ -66,7 +68,6 @@ class _PersonalInfoFormState extends State<PersonalInfoForm> {
         ),
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      print("sucssess pro");
       Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => VerificationCodeScreen()),
@@ -272,7 +273,6 @@ class _PersonalInfoFormState extends State<PersonalInfoForm> {
                       ),
                       onPressed: () {
                         registerUser();
-                        //  _submitForm();
                       },
                       child: const Text(
                         'تاكيد',

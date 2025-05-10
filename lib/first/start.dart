@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pro/first/Rigster.dart';
 import 'package:pro/widget/token.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({Key? key}) : super(key: key);
@@ -15,33 +14,33 @@ class _WelcomeScreen extends State<WelcomeScreen> {
   String? _token;
   String? _errorMessage;
 
-  Future<void> _signInWithGoogle() async {
-    final url = "http://192.168.1.9:8000/api/auth/google";
-    try {
-      if (await canLaunch(url)) {
-        await launch(url); // فتح واجهة Google OAuth
-        // بعد اختيار الحساب، توقع الرد من API الثانية
-        final callbackUrl = "http://192.168.1.9:8000/api/auth/google/callback";
-        final response = await http.get(Uri.parse(callbackUrl));
-        if (response.statusCode == 200) {
-          final data = json.decode(response.body);
+  // Future<void> _signInWithGoogle() async {
+  //   final url = "http://192.168.1.9:8000/api/auth/google";
+  //   try {
+  //     if (await canLaunch(url)) {
+  //       await launch(url); // فتح واجهة Google OAuth
+  //       // بعد اختيار الحساب، توقع الرد من API الثانية
+  //       final callbackUrl = "http://192.168.1.9:8000/api/auth/google/callback";
+  //       final response = await http.get(Uri.parse(callbackUrl));
+  //       if (response.statusCode == 200) {
+  //         final data = json.decode(response.body);
 
-          setState(() {
-            _token = data['token'];
-            _errorMessage = null;
-          });
-          await tokenManager.saveToken(_token!);
-          print("sucsses");
-        } else {
-          print(_errorMessage = "Error: ${response.body}");
-        }
-      } else {
-        print(_errorMessage = "Cannot launch URL. Check your configuration.");
-      }
-    } catch (e) {
-      print(_errorMessage = "Error: $e");
-    }
-  }
+  //         setState(() {
+  //           _token = data['token'];
+  //           _errorMessage = null;
+  //         });
+  //         await tokenManager.saveToken(_token!);
+  //         print("sucsses");
+  //       } else {
+  //         print(_errorMessage = "Error: ${response.body}");
+  //       }
+  //     } else {
+  //       print(_errorMessage = "Cannot launch URL. Check your configuration.");
+  //     }
+  //   } catch (e) {
+  //     print(_errorMessage = "Error: $e");
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -134,7 +133,7 @@ class _WelcomeScreen extends State<WelcomeScreen> {
                         ),
                       ),
                       onPressed: () async {
-                        await _signInWithGoogle();
+                        // await _signInWithGoogle();
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
