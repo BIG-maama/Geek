@@ -1,9 +1,10 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:pro/first/login_page.dart';
+import 'package:pro/Reigster/login_page.dart';
+import 'package:pro/Roles-Permission/user_permission.dart';
+import 'package:pro/Roles-Permission/users.dart';
 import 'package:pro/widget/constant_url.dart';
-import 'package:pro/widget/profile.dart';
 import 'package:pro/widget/token.dart';
 
 class king extends StatefulWidget {
@@ -65,33 +66,33 @@ class _king extends State<king> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      "name : ${UserData.currentUser!.name}",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    Text(
-                      "email : ${UserData.currentUser!.email}",
-                      style: TextStyle(fontSize: 14),
-                    ),
-                    SizedBox(height: 5),
-                    Text(
-                      "phone : ${UserData.currentUser!.phone}",
-                      style: TextStyle(fontSize: 14),
-                    ),
-                    SizedBox(height: 5),
-                    Text(
-                      "gender : ${UserData.currentUser!.gender}",
-                      style: TextStyle(fontSize: 14),
-                    ),
-                    SizedBox(height: 5),
-                    Text(
-                      "created_at : ${UserData.currentUser!.date}",
-                      style: TextStyle(fontSize: 14),
-                    ),
+                    // Text(
+                    //   "name : ${UserData.currentUser!.name}",
+                    //   style: TextStyle(
+                    //     fontSize: 20,
+                    //     fontWeight: FontWeight.bold,
+                    //   ),
+                    // ),
+                    // SizedBox(height: 5),
+                    // Text(
+                    //   "email : ${UserData.currentUser!.email}",
+                    //   style: TextStyle(fontSize: 14),
+                    // ),
+                    // SizedBox(height: 5),
+                    // Text(
+                    //   "phone : ${UserData.currentUser!.phone}",
+                    //   style: TextStyle(fontSize: 14),
+                    // ),
+                    // SizedBox(height: 5),
+                    // Text(
+                    //   "gender : ${UserData.currentUser!.gender}",
+                    //   style: TextStyle(fontSize: 14),
+                    // ),
+                    // SizedBox(height: 5),
+                    // Text(
+                    //   "created_at : ${UserData.currentUser!.date}",
+                    //   style: TextStyle(fontSize: 14),
+                    // ),
                   ],
                 ),
               ),
@@ -100,10 +101,31 @@ class _king extends State<king> {
                 child: Wrap(
                   runSpacing: 15,
                   children: [
-                    ListTile(
-                      leading: Icon(Icons.home),
-                      title: Text("home"),
-                      onTap: () {},
+                    ExpansionTile(
+                      leading: Icon(Icons.supervised_user_circle),
+                      title: Text("mange users"),
+                      children: [
+                        ListTile(
+                          title: Text('users'),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => Users_Roles()),
+                            );
+                          },
+                        ),
+                        ListTile(
+                          title: Text('permission'),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => User_Permission(),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
                     ),
 
                     Divider(),

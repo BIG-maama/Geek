@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pro/first/Rigster.dart';
+import 'package:pro/Reigster/home.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter App',
       theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'Almarai'),
-      home: PersonalInfoForm(),
+      home: king(),
       debugShowCheckedModeBanner: false,
     );
   }

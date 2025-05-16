@@ -4,7 +4,7 @@ import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'package:pro/first/home.dart';
+import 'package:pro/Reigster/home.dart';
 import 'package:pro/widget/constant_color.dart';
 
 import 'package:pro/widget/constant_url.dart';
@@ -115,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const SizedBox(height: 12.0),
 
-                  const Text(
+                  Text(
                     'التسجيل من خلال الايميل',
                     style: TextStyle(
                       color: AppColors.textGrey,

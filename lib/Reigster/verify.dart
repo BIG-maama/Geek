@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:pro/first/home.dart';
+import 'package:pro/Reigster/home.dart';
 import 'package:pro/widget/constant_url.dart';
 import 'package:pro/widget/token.dart';
 

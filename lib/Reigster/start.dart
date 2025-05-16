@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:pro/first/Rigster.dart';
+import 'package:pro/Reigster/Rigster.dart';
 import 'package:pro/widget/token.dart';
 
 class WelcomeScreen extends StatefulWidget {
