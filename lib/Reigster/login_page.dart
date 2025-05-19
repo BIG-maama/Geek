@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:pro/Reigster/home.dart';
-import 'package:pro/widget/constant_color.dart';
+//import 'package:pro/widget/constant_color.dart';
 
 import 'package:pro/widget/constant_url.dart';
+//import 'package:pro/widget/custom_radio.dart';
+import 'package:pro/widget/custom_text.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);

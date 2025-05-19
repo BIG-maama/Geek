@@ -1,18 +1,28 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:pro/Roles-Permission/user_permission.dart';
 import 'dart:convert';
 import 'package:pro/widget/constant_url.dart';
 import 'package:pro/widget/globalRoles.dart';
 
 class PermissionsPage extends StatefulWidget {
-  const PermissionsPage({Key? key}) : super(key: key);
+  final int? roleId;
+  final String? initialName;
+  final List<int>? initialPermissionIds;
+
+  const PermissionsPage({
+    Key? key,
+    this.roleId,
+    this.initialName,
+    this.initialPermissionIds,
+  }) : super(key: key);
 
   @override
   State<PermissionsPage> createState() => _PermissionsPageState();
 }
 
 class _PermissionsPageState extends State<PermissionsPage> {
+  late TextEditingController nameController;
   Map<int, String> permissionIdToName = {};
   Map<String, bool> selectedPermissions = {};
   bool isLoading = true;
@@ -23,6 +33,15 @@ class _PermissionsPageState extends State<PermissionsPage> {
   void initState() {
     super.initState();
     ShowAllPermission();
+    nameController = TextEditingController(text: widget.initialName ?? '');
+    userName = widget.initialName ?? '';
+    StoreNewRole();
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    super.dispose();
   }
 
   Future<void> ShowAllPermission() async {
@@ -41,7 +60,10 @@ class _PermissionsPageState extends State<PermissionsPage> {
           };
 
           selectedPermissions = {
-            for (var entry in data.entries) entry.value: false,
+            for (var entry in data.entries)
+              entry.value:
+                  widget.initialPermissionIds?.contains(int.parse(entry.key)) ??
+                  false,
           };
 
           isLoading = false;
@@ -70,11 +92,23 @@ class _PermissionsPageState extends State<PermissionsPage> {
     var payload = {"name": userName, "permissions": selectedIds};
 
     try {
-      var response = await http.post(
-        Uri.parse("$baseUrl/api/roles"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(payload),
-      );
+      http.Response response;
+
+      if (widget.roleId != null) {
+        // تعديل دور موجود
+        response = await http.put(
+          Uri.parse("$baseUrl/api/roles/${widget.roleId}"),
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode(payload),
+        );
+      } else {
+        // إنشاء دور جديد
+        response = await http.post(
+          Uri.parse("$baseUrl/api/roles"),
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode(payload),
+        );
+      }
 
       var result = jsonDecode(response.body);
 
@@ -87,25 +121,24 @@ class _PermissionsPageState extends State<PermissionsPage> {
           "permissions": List<String>.from(roleData["permissions"]),
         };
 
-        globalRoles.add(formattedRole); // حفظ الدور الجديد في القائمة
-        print(globalRoles);
+        globalRoles.removeWhere((role) => role["id"] == roleData["id"]);
+        globalRoles.add(formattedRole);
 
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => User_Permission(), // بدون تمرير roles
+        final snackBar = SnackBar(
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            title: 'نجاح!',
+            message: 'تم تنفيذ العملية بنجاح تام 🎉',
+            contentType: ContentType.success,
           ),
         );
-      } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("فشل في إنشاء الدور")));
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        Navigator.pop(context, true);
       }
     } catch (e) {
-      print("فشل الإرسال: $e");
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("فشل الإرسال")));
+      print("فشل العملية: $e");
     }
   }
 
@@ -127,6 +160,7 @@ class _PermissionsPageState extends State<PermissionsPage> {
                       const SizedBox(width: 10),
                       Expanded(
                         child: TextField(
+                          controller: nameController,
                           decoration: InputDecoration(
                             hintText: 'enter a Name',
                             border: OutlineInputBorder(),
@@ -152,12 +186,7 @@ class _PermissionsPageState extends State<PermissionsPage> {
                   ElevatedButton(
                     onPressed: () {
                       StoreNewRole();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => User_Permission(),
-                        ),
-                      );
+                      // إرسال نتيجة للصفحة السابقة
                     },
                     child: const Text("send permission"),
                   ),
