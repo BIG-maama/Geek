@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pro/Reigster/home.dart';
-import 'package:pro/Roles-Permission/View_Role_detials.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

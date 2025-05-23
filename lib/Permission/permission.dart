@@ -2,8 +2,9 @@ import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:pro/widget/constant_url.dart';
-import 'package:pro/widget/globalRoles.dart';
+//import 'package:pro/widget/constant_url.dart';
+//import 'package:pro/widget/globalRoles.dart';
+import 'package:pro/widget/Global.dart';
 
 class PermissionsPage extends StatefulWidget {
   final int? roleId;
@@ -35,7 +36,7 @@ class _PermissionsPageState extends State<PermissionsPage> {
     ShowAllPermission();
     nameController = TextEditingController(text: widget.initialName ?? '');
     userName = widget.initialName ?? '';
-    StoreNewRole();
+    //  StoreNewRole();
   }
 
   @override
@@ -95,14 +96,12 @@ class _PermissionsPageState extends State<PermissionsPage> {
       http.Response response;
 
       if (widget.roleId != null) {
-        // تعديل دور موجود
         response = await http.put(
           Uri.parse("$baseUrl/api/roles/${widget.roleId}"),
           headers: {"Content-Type": "application/json"},
           body: jsonEncode(payload),
         );
       } else {
-        // إنشاء دور جديد
         response = await http.post(
           Uri.parse("$baseUrl/api/roles"),
           headers: {"Content-Type": "application/json"},
@@ -114,28 +113,57 @@ class _PermissionsPageState extends State<PermissionsPage> {
 
       if (result["status"] == "success") {
         Map<String, dynamic> roleData = result["role"];
-
         Map<String, dynamic> formattedRole = {
           "name": roleData["name"],
           "id": roleData["id"],
           "permissions": List<String>.from(roleData["permissions"]),
         };
-
         globalRoles.removeWhere((role) => role["id"] == roleData["id"]);
         globalRoles.add(formattedRole);
 
-        final snackBar = SnackBar(
-          elevation: 0,
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.transparent,
-          content: AwesomeSnackbarContent(
-            title: 'نجاح!',
-            message: 'تم تنفيذ العملية بنجاح تام 🎉',
-            contentType: ContentType.success,
-          ),
-        );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        Navigator.pop(context, true);
+        Navigator.pop(context, true); // <-- الرجوع إلى صفحة User_Permission
+
+        Future.delayed(Duration(milliseconds: 300), () {
+          final snackBar = SnackBar(
+            elevation: 0,
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.transparent,
+            content: AwesomeSnackbarContent(
+              title: 'نجاح!',
+              message: 'تم تنفيذ العملية بنجاح تام 🎉',
+              contentType: ContentType.success,
+            ),
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        });
+      } else if (result["status"] == "sucseess") {
+        Map<String, dynamic> roleData = result["role"];
+        print("gg");
+        Map<String, dynamic> formattedRole = {
+          "name": roleData["name"],
+          "id": roleData["id"],
+          "permissions": List<String>.from(result["permissions"]),
+        };
+        print("3ds");
+        globalRoles.removeWhere((role) => role["id"] == roleData["id"]);
+        globalRoles.add(formattedRole);
+
+        Navigator.pop(context, true); // <-- الرجوع إلى صفحة User_Permission
+
+        // بعد الرجوع، انتظر ثم أظهر SnackBar
+        Future.delayed(Duration(milliseconds: 300), () {
+          final snackBar = SnackBar(
+            elevation: 0,
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.transparent,
+            content: AwesomeSnackbarContent(
+              title: 'تحديث!',
+              message: 'تم تنفيذ العملية بنجاح تام 🎉',
+              contentType: ContentType.success,
+            ),
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        });
       }
     } catch (e) {
       print("فشل العملية: $e");
@@ -186,7 +214,6 @@ class _PermissionsPageState extends State<PermissionsPage> {
                   ElevatedButton(
                     onPressed: () {
                       StoreNewRole();
-                      // إرسال نتيجة للصفحة السابقة
                     },
                     child: const Text("send permission"),
                   ),

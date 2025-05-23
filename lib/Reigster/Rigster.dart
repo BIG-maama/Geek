@@ -3,7 +3,7 @@ import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pro/Reigster/verify.dart';
-import 'package:pro/widget/constant_url.dart';
+import 'package:pro/widget/Global.dart';
 //import 'package:pro/widget/custom_radio.dart';
 import 'package:pro/widget/custom_text.dart';
 import 'package:pro/widget/profile.dart';

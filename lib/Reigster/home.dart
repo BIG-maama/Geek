@@ -2,9 +2,9 @@ import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pro/Reigster/login_page.dart';
-import 'package:pro/Roles-Permission/user_permission.dart';
-import 'package:pro/Roles-Permission/users.dart';
-import 'package:pro/widget/constant_url.dart';
+import 'package:pro/Permission/user_permission.dart';
+import 'package:pro/Roles/users.dart';
+import 'package:pro/widget/Global.dart';
 import 'package:pro/widget/token.dart';
 
 class king extends StatefulWidget {
@@ -110,7 +110,9 @@ class _king extends State<king> {
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (_) => Users_Roles()),
+                              MaterialPageRoute(
+                                builder: (_) => UserManagementPage(),
+                              ),
                             );
                           },
                         ),
