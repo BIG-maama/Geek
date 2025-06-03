@@ -1,6 +1,9 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:pro/BottomNavigator/DashBoard/Dashboard.dart';
+import 'package:pro/BottomNavigator/Medicines/Medicines.dart';
+import 'package:pro/BottomNavigator/Suppliers/Suppliers.dart';
 import 'package:pro/Reigster/login_page.dart';
 import 'package:pro/Permission/user_permission.dart';
 import 'package:pro/Roles/users.dart';
@@ -14,6 +17,7 @@ class king extends StatefulWidget {
 }
 
 class _king extends State<king> {
+  int currentIndex = 0;
   Future<void> logout(BuildContext context) async {
     final token = await tokenManager.getToken();
 
@@ -52,6 +56,11 @@ class _king extends State<king> {
     );
   }
 
+  final List<Widget> pages = const [
+    Dashboard(),
+    Medicines_page(),
+    SuppliersPage(),
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -119,6 +128,23 @@ class _king extends State<king> {
                         ListTile(
                           title: Text('permission'),
                           onTap: () {
+                            // FancySnackBar.showSnackBar(
+                            //   context: context,
+                            //   snackBarType: FancySnackBarType.success,
+                            //   title: "نجاح",
+                            //   message: "تم تنفيذ العملية بنجاح!",
+                            //   duration: 2,
+                            // );
+                            // FancySnackbar.show(
+                            //   context,
+                            //   AssetsPath.success,
+                            //   logo: Text("success"),
+                            // );
+                            // BotToast.showText(
+                            //   text: "عملية ناجحة!",
+                            //   duration: Duration(seconds: 2),
+                            //   contentColor: Colors.green,
+                            // );
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -146,7 +172,25 @@ class _king extends State<king> {
           ),
         ),
       ),
-      body: Center(child: Text(" whatsapp my back-end")),
+      body: pages[currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: currentIndex,
+        onTap: (index) => setState(() => currentIndex = index),
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard_rounded),
+            label: "Dashborad",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.medical_services_outlined),
+            label: "Medicines",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.support_agent_rounded),
+            label: "Suppliers",
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,7 +1,8 @@
 import 'dart:convert';
-
+import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:pro/Roles/view_user_details.dart';
 import 'package:pro/widget/Global.dart';
 
 class UserManagementPage extends StatefulWidget {
@@ -10,8 +11,6 @@ class UserManagementPage extends StatefulWidget {
 }
 
 class _UserManagementPageState extends State<UserManagementPage> {
-  // List<Map<String, dynamic>> users = [];
-
   final _formKey = GlobalKey<FormState>();
   String selectedRole = globalRoles.isNotEmpty ? globalRoles[0]["name"] : "";
 
@@ -53,9 +52,13 @@ class _UserManagementPageState extends State<UserManagementPage> {
           "roles": List<Map<String, dynamic>>.from(userData["roles"]),
         };
 
-        setState(() {
-          createUser.add(newUser);
-        });
+        createUser.clear();
+        createUser.add(newUser);
+        await fetchAllUsers();
+        if (mounted) {
+          setState(() {});
+        }
+
         print(createUser);
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -176,11 +179,9 @@ class _UserManagementPageState extends State<UserManagementPage> {
     try {
       final response = await http.delete(uri);
       print(response);
-      if (response.statusCode == 200 || response.statusCode == 204) {
-        // إزالة المستخدم من القائمة وتحديث الواجهة
-        setState(() {
-          createUser.removeWhere((user) => user["id"] == userId);
-        });
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        showAllUsers.removeWhere((user) => user["id"] == userId);
+        setState(() {});
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("✅ تم حذف المستخدم بنجاح")),
@@ -204,10 +205,8 @@ class _UserManagementPageState extends State<UserManagementPage> {
 
     try {
       final response = await http.get(Uri.parse(url));
-
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-
         if (data["status"] == "success") {
           viewUserDetails.add(data["data"]);
           print(viewUserDetails);
@@ -222,6 +221,48 @@ class _UserManagementPageState extends State<UserManagementPage> {
     }
   }
 
+  Future<void> fetchAllUsers() async {
+    final uri = Uri.parse('$baseUrl/api/users');
+
+    try {
+      final response = await http.get(uri);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        print(data);
+        if (data["status"] == "success") {
+          final users = List<Map<String, dynamic>>.from(data["data"]);
+          showAllUsers.clear();
+          for (var role in users) {
+            showAllUsers.add({
+              "id": role["id"],
+              "name": role["name"],
+              "email": role["email"],
+              "phone": role["phone"],
+              "gender": role["gender"],
+              "roles": List<String>.from(role["roles"]),
+            });
+          }
+          //  print(showAllUsers);
+          return;
+        } else {
+          print("فشل في الجلب: ${data["message"]}");
+        }
+      } else {
+        print("فشل في الاتصال بالسيرفر: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("حدث خطأ أثناء الجلب: $e");
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchAllUsers().then((_) {
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -232,13 +273,14 @@ class _UserManagementPageState extends State<UserManagementPage> {
         label: Text("Add User"),
       ),
       body:
-          createUser.isEmpty
+          showAllUsers.isEmpty
               ? Center(child: Text("لا يوجد مستخدمين بعد"))
               : ListView.builder(
+                shrinkWrap: true,
                 padding: const EdgeInsets.all(16),
-                itemCount: createUser.length,
+                itemCount: showAllUsers.length,
                 itemBuilder: (context, index) {
-                  final user = createUser[index];
+                  final user = showAllUsers[index];
                   return Container(
                     margin: EdgeInsets.only(bottom: 16),
                     padding: EdgeInsets.all(16),
@@ -254,10 +296,9 @@ class _UserManagementPageState extends State<UserManagementPage> {
                         _buildRow("البريد", user["email"]),
                         _buildRow("الهاتف", user["phone"]),
                         _buildRow("الجنس", user["gender"]),
-                        _buildRow(
-                          "الدور",
-                          user["roles"].map((r) => r["name"]).join(", "),
-                        ),
+                        _buildRow("اي دي", user["id"].toString()),
+                        _buildRow("الدور", (user["roles"] as List).join(", ")),
+
                         Align(
                           alignment: Alignment.centerRight,
                           child: PopupMenuButton<String>(
@@ -268,6 +309,12 @@ class _UserManagementPageState extends State<UserManagementPage> {
                                 _deleteUser(user["id"]);
                               } else if (value == 'show') {
                                 showOneUser(user["id"]);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => UserSuccessView(),
+                                  ),
+                                );
                               }
                             },
                             itemBuilder:

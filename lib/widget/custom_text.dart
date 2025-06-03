@@ -23,6 +23,7 @@ class CustomTextField extends StatelessWidget {
     this.onTogglePasswordVisibility,
     this.passwordVisible = false,
     this.keyboardType = TextInputType.text,
+    //required int maxLines,
   }) : super(key: key);
 
   @override

@@ -2,8 +2,6 @@ import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-//import 'package:pro/widget/constant_url.dart';
-//import 'package:pro/widget/globalRoles.dart';
 import 'package:pro/widget/Global.dart';
 
 class PermissionsPage extends StatefulWidget {
@@ -121,7 +119,7 @@ class _PermissionsPageState extends State<PermissionsPage> {
         globalRoles.removeWhere((role) => role["id"] == roleData["id"]);
         globalRoles.add(formattedRole);
 
-        Navigator.pop(context, true); // <-- الرجوع إلى صفحة User_Permission
+        Navigator.pop(context, true);
 
         Future.delayed(Duration(milliseconds: 300), () {
           final snackBar = SnackBar(

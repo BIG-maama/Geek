@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:ffi';
-
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -8,7 +6,6 @@ import 'package:pro/Permission/View_Role_detials.dart';
 import 'package:pro/Permission/all_role&permission.dart';
 import 'package:pro/Permission/permission.dart';
 import 'package:pro/widget/Global.dart';
-// استيراد المتغير
 
 class User_Permission extends StatefulWidget {
   const User_Permission({Key? key}) : super(key: key);

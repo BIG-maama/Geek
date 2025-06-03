@@ -2,7 +2,7 @@ List<Map<String, dynamic>> viewUserDetails = [];
 List<Map<String, dynamic>> createUser = [];
 List<Map<String, dynamic>> showAllUsers = [];
 List<Map<String, dynamic>> globalRoles = [];
-const String baseUrl = "http://192.168.1.106:8000";
+const String baseUrl = "http://192.168.1.12:8000";
 //create user
 // {
 //     "status": "success",
