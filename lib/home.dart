@@ -58,7 +58,7 @@ class _king extends State<king> {
 
   final List<Widget> pages = const [
     Dashboard(),
-    Medicines_page(),
+    Medicines_Category_page(),
     SuppliersPage(),
   ];
   @override

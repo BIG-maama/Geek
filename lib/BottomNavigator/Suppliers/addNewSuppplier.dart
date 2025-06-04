@@ -3,7 +3,6 @@ import 'package:dio/dio.dart';
 import 'package:fancy_snackbar/fancy_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:pro/BottomNavigator/Suppliers/Suppliers.dart';
 import 'package:pro/BottomNavigator/Suppliers/supplier_profile.dart';
 import 'package:pro/widget/Global.dart';
 import 'package:pro/widget/custom_text.dart';
@@ -34,14 +33,9 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
           "address": addressController.text,
         },
       );
-
       final supplier = SupplierProfile.fromJson(response.data['supplier']);
-      // print("Supplier object: ${supplier.toString()}");
       final box = Hive.box<SupplierProfile>('suppliers');
-      // print("Will store to Hive: ${supplier.toString()}");
       await box.add(supplier);
-      //print("Stored successfully! Hive box length: ${box.length}");
-
       FancySnackbar.show(
         context,
         "success",

@@ -2,6 +2,7 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:pro/BottomNavigator/Medicines/medic_&_catg_info.dart';
 import 'package:pro/BottomNavigator/Suppliers/supplier_profile.dart';
 import 'package:pro/home.dart';
 
@@ -9,7 +10,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   Hive.registerAdapter(SupplierProfileAdapter());
+  Hive.registerAdapter(CategoryInfoAdapter());
   await Hive.openBox<SupplierProfile>('suppliers');
+  await Hive.openBox<CategoryInfo>('categorys');
   runApp(MyApp());
 }
 
@@ -29,45 +32,37 @@ class MyApp extends StatelessWidget {
   }
 }
 
+
+
+
+
+//http://localhost:8000/api/medicines
 // {
 //     "status": true,
 //     "status_code": 200,
-//     "message": "messages.supplier_details_retrieved",
-//     "data": {
-//         "supplier": {
-//             "id": 3,
-//             "company_name": "عرصبا",
-//             "contact_person_name": "ويللللي",
-//             "phone": "9024254375",
-//             "email": "ma2151281@gmail.com",
-//             "address": "عمان",
-//             "bio": null,
-//             "is_active": 1,
-//             "created_at": "2025-06-01T16:03:07.000000Z",
-//             "updated_at": "2025-06-01T16:03:07.000000Z"
-//         },
-//         "statistics": {
-//             "orders": {
-//                 "total": 0,
-//                 "pending": 0,
-//                 "confirmed": 0,
-//                 "completed": 0,
-//                 "cancelled": 0
-//             },
-//             "payments": {
-//                 "total_paid": 0,
-//                 "pending_payments": 0
-//             },
-//             "orders_summary": {
-//                 "last_order_date": null,
-//                 "last_payment_date": null
-//             },
-//             "credit_info": {
-//                 "credit_limit": "0.00",
-//                 "payment_method": "cash"
-//             }
-//         },
-//         "recent_orders": [],
-//         "recent_payments": []
-//     }
+//     "medicine": {
+//         "medicine_name": "dddd",
+//         "arabic_name": "sdsdsdsd",
+//         "bar_code": "1212228",
+//         "type": "unit",
+//         "category_id": "1",
+//         "quantity": "1",
+//         "alert_quantity": "4",
+//         "people_price": "22",
+//         "supplier_price": "44",
+//         "tax_rate": "3",
+//         "updated_at": "2025-06-04T14:37:32.000000Z",
+//         "created_at": "2025-06-04T14:37:32.000000Z",
+//         "id": 1,
+//         "attachments": []
+//     },
+//     "message": "تم إضافة الدواء والمرفق بنجاح"
+// }
+
+//http://localhost:8000/api/generaite-barcode
+
+// {
+//     "bar_code": 55094183,
+//     "status": true,
+//     "status_code": 200
 // }

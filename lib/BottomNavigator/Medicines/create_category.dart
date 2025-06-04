@@ -1,6 +1,8 @@
 import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:hive/hive.dart';
+import 'package:pro/BottomNavigator/Medicines/medic_&_catg_info.dart';
 import 'package:pro/widget/Global.dart';
 import 'package:pro/widget/custom_text.dart';
 
@@ -30,6 +32,9 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+        final category = CategoryInfo.fromJson(response.data['category']);
+        final box = Hive.box<CategoryInfo>('categorys');
+        await box.add(category);
         Navigator.pop(context);
         AnimatedSnackBar.material(
           response.data['message'],
