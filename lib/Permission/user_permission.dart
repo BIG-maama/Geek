@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pro/Permission/View_Role_detials.dart';
@@ -21,18 +20,6 @@ class _Permission extends State<User_Permission> {
 
       if (response.statusCode == 200) {
         globalRoles.removeWhere((role) => role["id"] == id);
-
-        final snackBar = SnackBar(
-          elevation: 0,
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.transparent,
-          content: AwesomeSnackbarContent(
-            title: 'warning!',
-            message: 'be careful for what you do ',
-            contentType: ContentType.failure,
-          ),
-        );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("فشل في الحذف: ${response.statusCode}")),

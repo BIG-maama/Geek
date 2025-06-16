@@ -11,8 +11,15 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(SupplierProfileAdapter());
   Hive.registerAdapter(CategoryInfoAdapter());
+  Hive.registerAdapter(PricesAdapter());
+  Hive.registerAdapter(CategoryAdapter());
+  Hive.registerAdapter(MedicineFormAdapter());
+  Hive.registerAdapter(StatusAdapter());
+  Hive.registerAdapter(MedicInfoAdapter());
   await Hive.openBox<SupplierProfile>('suppliers');
   await Hive.openBox<CategoryInfo>('categorys');
+  await Hive.deleteBoxFromDisk('medics');
+  await Hive.openBox<MedicInfo>('medics');
   runApp(MyApp());
 }
 
@@ -36,33 +43,60 @@ class MyApp extends StatelessWidget {
 
 
 
-//http://localhost:8000/api/medicines
-// {
+
+//http://localhost:8000/api/show-all-alternatives/1
+
+//  {
 //     "status": true,
 //     "status_code": 200,
-//     "medicine": {
-//         "medicine_name": "dddd",
-//         "arabic_name": "sdsdsdsd",
-//         "bar_code": "1212228",
-//         "type": "unit",
-//         "category_id": "1",
-//         "quantity": "1",
-//         "alert_quantity": "4",
-//         "people_price": "22",
-//         "supplier_price": "44",
-//         "tax_rate": "3",
-//         "updated_at": "2025-06-04T14:37:32.000000Z",
-//         "created_at": "2025-06-04T14:37:32.000000Z",
-//         "id": 1,
-//         "attachments": []
+//     "message": "تم جلب الأدوية البديلة بنجاح",
+//     "data": {
+//         "medicine": {
+//             "id": 1,
+//             "name": "ddddddq",
+//             "scientific_name": null,
+//             "arabic_name": "sdsdsdsl",
+//             "barcode": "12121213"
+//         },
+//         "alternatives": [
+//             {
+//                 "id": 2,
+//                 "name": "dddd",
+//                 "scientific_name": null,
+//                 "arabic_name": "sdsds",
+//                 "barcode": "12121215",
+//                 "type": "unit",
+//                 "quantity": 12,
+//                 "prices": {
+//                     "people_price": "22.00",
+//                     "supplier_price": "44.00"
+//                 },
+//                 "category": {
+//                     "id": 1,
+//                     "name": "مسكنات"
+//                 }
+//             },
+//             {
+//                 "id": 3,
+//                 "name": "ddddtt",
+//                 "scientific_name": null,
+//                 "arabic_name": "sdsdsyy",
+//                 "barcode": "12121255",
+//                 "type": "unit",
+//                 "quantity": 12,
+//                 "prices": {
+//                     "people_price": "22.00",
+//                     "supplier_price": "44.00"
+//                 },
+//                 "category": {
+//                     "id": 1,
+//                     "name": "مسكنات"
+//                 }
+//             }
+//         ]
 //     },
-//     "message": "تم إضافة الدواء والمرفق بنجاح"
+//     "meta": {
+//         "total_alternatives": 2
+//     }
 // }
 
-//http://localhost:8000/api/generaite-barcode
-
-// {
-//     "bar_code": 55094183,
-//     "status": true,
-//     "status_code": 200
-// }

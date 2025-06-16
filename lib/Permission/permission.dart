@@ -1,4 +1,3 @@
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -121,19 +120,7 @@ class _PermissionsPageState extends State<PermissionsPage> {
 
         Navigator.pop(context, true);
 
-        Future.delayed(Duration(milliseconds: 300), () {
-          final snackBar = SnackBar(
-            elevation: 0,
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: Colors.transparent,
-            content: AwesomeSnackbarContent(
-              title: 'نجاح!',
-              message: 'تم تنفيذ العملية بنجاح تام 🎉',
-              contentType: ContentType.success,
-            ),
-          );
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        });
+        Future.delayed(Duration(milliseconds: 300), () {});
       } else if (result["status"] == "sucseess") {
         Map<String, dynamic> roleData = result["role"];
         print("gg");
@@ -147,21 +134,6 @@ class _PermissionsPageState extends State<PermissionsPage> {
         globalRoles.add(formattedRole);
 
         Navigator.pop(context, true); // <-- الرجوع إلى صفحة User_Permission
-
-        // بعد الرجوع، انتظر ثم أظهر SnackBar
-        Future.delayed(Duration(milliseconds: 300), () {
-          final snackBar = SnackBar(
-            elevation: 0,
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: Colors.transparent,
-            content: AwesomeSnackbarContent(
-              title: 'تحديث!',
-              message: 'تم تنفيذ العملية بنجاح تام 🎉',
-              contentType: ContentType.success,
-            ),
-          );
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        });
       }
     } catch (e) {
       print("فشل العملية: $e");

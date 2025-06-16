@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -43,19 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
       //   ),
       // );
 
-      final snackBar = SnackBar(
-        elevation: 0,
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: Colors.transparent,
-        content: AwesomeSnackbarContent(
-          title: 'نجاح!',
-          message: 'تم تنفيذ العملية بنجاح تام 🎉',
-          contentType: ContentType.success,
-        ),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
-      print("sucssess pro");
+      //  print("sucssess pro");
       Navigator.push(context, MaterialPageRoute(builder: (_) => king()));
     }
   }

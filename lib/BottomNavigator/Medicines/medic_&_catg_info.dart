@@ -27,64 +27,227 @@ class CategoryInfo extends HiveObject {
   }
 }
 
-@HiveType(typeId: 2)
-class MedicInfo extends HiveObject {
+@HiveType(typeId: 31)
+class Prices {
   @HiveField(0)
-  String medicine_name;
+  int supplierPrice;
+
   @HiveField(1)
-  String arabic_name;
+  int peoplePrice;
+
   @HiveField(2)
-  String bar_code;
-  @HiveField(3)
-  String type;
-  @HiveField(4)
-  String category_id;
-  @HiveField(5)
-  String quantity;
-  @HiveField(6)
-  String alert_quantity;
-  @HiveField(7)
-  String people_price;
-  @HiveField(8)
-  String supplier_price;
-  @HiveField(9)
-  String tax_rate;
-  @HiveField(10)
-  int id;
-  @HiveField(11)
-  String created_at;
-  @HiveField(12)
-  List attachments;
-  MedicInfo({
-    required this.medicine_name,
-    required this.arabic_name,
-    required this.type,
-    required this.category_id,
-    required this.quantity,
-    required this.bar_code,
-    required this.alert_quantity,
-    required this.people_price,
-    required this.supplier_price,
-    required this.tax_rate,
-    required this.id,
-    required this.created_at,
-    required this.attachments,
+  int taxRate;
+
+  Prices({
+    required this.supplierPrice,
+    required this.peoplePrice,
+    required this.taxRate,
   });
-  factory MedicInfo.fromJson(Map<String, dynamic> json) {
-    return MedicInfo(
-      medicine_name: json['medicine_name'],
-      arabic_name: json['arabic_name'],
-      type: json['type'],
-      category_id: json['category_id'],
-      quantity: json['quantity'],
-      bar_code: json['bar_code'],
-      alert_quantity: json['alert_quantity'],
-      people_price: json['people_price'],
-      supplier_price: json['supplier_price'],
-      tax_rate: json['tax_rate'],
-      id: json['id'],
-      created_at: json['created_at'],
-      attachments: json['attachments'],
+
+  factory Prices.fromJson(Map<String, dynamic> json) => Prices(
+    supplierPrice: int.tryParse(json['supplier_price'].toString()) ?? 0,
+    peoplePrice: int.tryParse(json['people_price'].toString()) ?? 0,
+    taxRate: int.tryParse(json['tax_rate'].toString()) ?? 0,
+  );
+}
+
+@HiveType(typeId: 4)
+class Category {
+  @HiveField(0)
+  int id;
+
+  @HiveField(1)
+  String name;
+
+  Category({required this.id, required this.name});
+
+  factory Category.fromJson(Map<String, dynamic> json) {
+    return Category(
+      id: int.tryParse(json['id'].toString()) ?? 0,
+      name: json['name'] ?? '',
     );
   }
 }
+
+@HiveType(typeId: 5)
+class MedicineForm {
+  @HiveField(0)
+  int id;
+
+  @HiveField(1)
+  String name;
+
+  @HiveField(2)
+  String description;
+
+  MedicineForm({
+    required this.id,
+    required this.name,
+    required this.description,
+  });
+
+  factory MedicineForm.fromJson(Map<String, dynamic> json) {
+    return MedicineForm(
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      description: json['description'] ?? '',
+    );
+  }
+}
+
+@HiveType(typeId: 6)
+class Status {
+  @HiveField(0)
+  bool isLow;
+
+  @HiveField(1)
+  bool isOut;
+
+  @HiveField(2)
+  bool isExpired;
+
+  @HiveField(3)
+  bool isExpiringSoon;
+
+  Status({
+    required this.isLow,
+    required this.isOut,
+    required this.isExpired,
+    required this.isExpiringSoon,
+  });
+
+  factory Status.fromJson(Map<String, dynamic> json) {
+    return Status(
+      isLow: json['is_low'] ?? false,
+      isOut: json['is_out'] ?? false,
+      isExpired: json['is_expired'] ?? false,
+      isExpiringSoon: json['is_expiring_soon'] ?? false,
+    );
+  }
+}
+
+@HiveType(typeId: 7)
+class MedicInfo extends HiveObject {
+  @HiveField(0)
+  String name;
+
+  @HiveField(1)
+  String arabicName;
+
+  @HiveField(2)
+  String barcode;
+
+  @HiveField(3)
+  String type;
+
+  @HiveField(4)
+  String quantity;
+
+  @HiveField(5)
+  String alertQuantity;
+
+  @HiveField(6)
+  String expiryDate;
+
+  @HiveField(7)
+  int id;
+
+  @HiveField(8)
+  List<dynamic> attachments;
+
+  @HiveField(9)
+  Prices prices;
+
+  @HiveField(10)
+  Category category;
+
+  @HiveField(11)
+  MedicineForm medicineForm;
+
+  @HiveField(12)
+  Status status;
+
+  MedicInfo({
+    required this.name,
+    required this.arabicName,
+    required this.barcode,
+    required this.type,
+    required this.quantity,
+    required this.alertQuantity,
+    required this.expiryDate,
+    required this.id,
+    required this.attachments,
+    required this.prices,
+    required this.category,
+    required this.medicineForm,
+    required this.status,
+  });
+
+  factory MedicInfo.fromJson(Map<String, dynamic> json) {
+    final medicine = json['medicine'] ?? json;
+
+    return MedicInfo(
+      name: medicine['name'] ?? '',
+      arabicName: medicine['arabic_name'] ?? '',
+      barcode: medicine['barcode'] ?? '',
+      type: medicine['type'] ?? '',
+      quantity: medicine['quantity']?.toString() ?? '0',
+      alertQuantity: medicine['alert_quantity']?.toString() ?? '0',
+      expiryDate: medicine['expiry_date'] ?? '',
+      id: medicine['id'] ?? 0,
+      attachments: json['attachments'] ?? [],
+      prices: Prices.fromJson(medicine['prices'] ?? {}),
+      category: Category.fromJson(medicine['category'] ?? {}),
+      medicineForm: MedicineForm.fromJson(medicine['medicine_form'] ?? {}),
+      status: Status.fromJson(medicine['status'] ?? {}),
+    );
+  }
+}
+
+
+
+
+// {
+//     "status": true,
+//     "status_code": 200,
+//     "medicine": {
+//         "id": 6,
+//         "name": "hhslsmms",
+//         "scientific_name": null,
+//         "arabic_name": "fgfgdgds",
+//         "barcode": "1214422",
+//         "type": "unit",
+//         "quantity": "12",
+//         "alert_quantity": "4",
+//         "prices": {
+//             "supplier_price": "44",
+//             "people_price": "22",
+//             "tax_rate": "3"
+//         },
+//         "expiry_date": "2025-06-04",
+//         "category": {
+//             "id": 1,
+//             "name": "google"
+//         },
+//         "medicine_form": {
+//             "id": 1,
+//             "name": "ابر",
+//             "description": "ابر"
+//         },
+//         "status": {
+//             "is_low": false,
+//             "is_out": false,
+//             "is_expired": true,
+//             "is_expiring_soon": false
+//         }
+//     },
+//     "attachments": [
+//         {
+//             "id": 6,
+//             "file_name": "Screenshot 2025-03-25 213038.png",
+//             "file_path": "medicine-attachments/34qNoN5xhDY7AqzrImVG.png",
+//             "full_url": "http://192.168.1.103:8000/storage/medicine-attachments/34qNoN5xhDY7AqzrImVG.png"
+//         }
+//     ],
+//     "message": "تم إضافة الدواء والمرفقات بنجاح"
+// }

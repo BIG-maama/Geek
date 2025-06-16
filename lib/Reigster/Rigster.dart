@@ -322,7 +322,6 @@
 // }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 import 'dart:convert';
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
@@ -385,21 +384,7 @@ class RegisterFormNotifier extends StateNotifier<RegisterFormState> {
         final data = jsonDecode(responseData);
         final token = data['token'];
         UserData.currentUser = UserModel.fromJson(data['user']);
-
         await tokenManager.saveToken(token);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            elevation: 0,
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: Colors.transparent,
-            content: AwesomeSnackbarContent(
-              title: 'نجاح!',
-              message: 'تم تنفيذ العملية بنجاح تام 🎉',
-              contentType: ContentType.success,
-            ),
-          ),
-        );
-
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => VerificationCodeScreen()),

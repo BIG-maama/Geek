@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pro/home.dart';
@@ -35,17 +34,6 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
         final data = jsonDecode(responseData);
         final showmessage = data['message'] ?? 'تم التحقق بنجاح';
 
-        final snackBar = SnackBar(
-          elevation: 0,
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.transparent,
-          content: AwesomeSnackbarContent(
-            title: 'نجاح!',
-            message: showmessage,
-            contentType: ContentType.success,
-          ),
-        );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
         print("Success: $showmessage");
         Navigator.pushReplacement(
           context,
@@ -54,32 +42,9 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
       } else {
         final data = jsonDecode(responseData);
         final errorMessage = data['message'] ?? 'حدث خطأ غير متوقع';
-
-        final snackBar = SnackBar(
-          elevation: 0,
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.transparent,
-          content: AwesomeSnackbarContent(
-            title: 'خطأ!',
-            message: errorMessage,
-            contentType: ContentType.failure,
-          ),
-        );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
         print("Error ${response.statusCode}: $errorMessage");
       }
     } catch (e) {
-      final snackBar = SnackBar(
-        elevation: 0,
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: Colors.transparent,
-        content: AwesomeSnackbarContent(
-          title: 'استثناء!',
-          message: 'حدث خطأ أثناء التحقق: $e',
-          contentType: ContentType.failure,
-        ),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
       print("Exception: $e");
     }
   }

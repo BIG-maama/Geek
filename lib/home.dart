@@ -1,4 +1,4 @@
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pro/BottomNavigator/DashBoard/Dashboard.dart';
@@ -20,26 +20,13 @@ class _king extends State<king> {
   int currentIndex = 0;
   Future<void> logout(BuildContext context) async {
     final token = await tokenManager.getToken();
-
     if (token != null) {
       try {
         final response = await http.post(
           Uri.parse('$baseUrl/api/logout-user'),
           headers: {'Authorization': 'Bearer $token'},
         );
-
         if (response.statusCode == 200) {
-          final snackBar = SnackBar(
-            elevation: 0,
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: Colors.transparent,
-            content: AwesomeSnackbarContent(
-              title: 'نجاح!',
-              message: 'تم تنفيذ العملية بنجاح تام 🎉',
-              contentType: ContentType.success,
-            ),
-          );
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
         } else {
           print("Logout failed: ${response.statusCode}");
         }
@@ -49,11 +36,7 @@ class _king extends State<king> {
     }
 
     await tokenManager.clearToken();
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const LoginScreen()),
-    );
+    CustomNavigator.pushReplacement(context, LoginScreen());
   }
 
   final List<Widget> pages = const [
@@ -110,45 +93,77 @@ class _king extends State<king> {
                 child: Wrap(
                   runSpacing: 15,
                   children: [
-                    ExpansionTile(
-                      leading: Icon(Icons.supervised_user_circle),
-                      title: Text("mange users"),
+                    // ExpansionTile(
+                    //   leading: Icon(Icons.supervised_user_circle),
+                    //   title: Text("mange users"),
+                    //   children: [
+                    //     ListTile(
+                    //       title: Text('users'),
+                    //       onTap: () {
+                    //         Navigator.push(
+                    //           context,
+                    //           MaterialPageRoute(
+                    //             builder: (_) => UserManagementPage(),
+                    //           ),
+                    //         );
+                    //       },
+                    //     ),
+                    //     ListTile(
+                    //       title: Text('permission'),
+                    //       onTap: () {
+                    //         // FancySnackBar.showSnackBar(
+                    //         //   context: context,
+                    //         //   snackBarType: FancySnackBarType.success,
+                    //         //   title: "نجاح",
+                    //         //   message: "تم تنفيذ العملية بنجاح!",
+                    //         //   duration: 2,
+                    //         // );
+                    //         // FancySnackbar.show(
+                    //         //   context,
+                    //         //   AssetsPath.success,
+                    //         //   logo: Text("success"),
+                    //         // );
+                    //         // BotToast.showText(
+                    //         //   text: "عملية ناجحة!",
+                    //         //   duration: Duration(seconds: 2),
+                    //         //   contentColor: Colors.green,
+                    //         // );
+                    //         Navigator.push(
+                    //           context,
+                    //           MaterialPageRoute(
+                    //             builder: (_) => User_Permission(),
+                    //           ),
+                    //         );
+                    //       },
+                    //     ),
+                    //   ],
+                    // ),
+                    CupertinoExpansionTileAnimated(
+                      leading: const Icon(CupertinoIcons.settings),
+                      title: const Text("إعدادات المستخدم"),
                       children: [
-                        ListTile(
-                          title: Text('users'),
-                          onTap: () {
+                        CupertinoButton(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          color: CupertinoColors.systemGrey5,
+                          child: const Text("المستخدمين"),
+                          onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(
+                              CupertinoPageRoute(
                                 builder: (_) => UserManagementPage(),
                               ),
                             );
                           },
                         ),
-                        ListTile(
-                          title: Text('permission'),
-                          onTap: () {
-                            // FancySnackBar.showSnackBar(
-                            //   context: context,
-                            //   snackBarType: FancySnackBarType.success,
-                            //   title: "نجاح",
-                            //   message: "تم تنفيذ العملية بنجاح!",
-                            //   duration: 2,
-                            // );
-                            // FancySnackbar.show(
-                            //   context,
-                            //   AssetsPath.success,
-                            //   logo: Text("success"),
-                            // );
-                            // BotToast.showText(
-                            //   text: "عملية ناجحة!",
-                            //   duration: Duration(seconds: 2),
-                            //   contentColor: Colors.green,
-                            // );
+                        CupertinoButton(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          color: CupertinoColors.systemGrey5,
+                          child: const Text("الصلاحيات"),
+                          onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(
-                                builder: (_) => User_Permission(),
+                              CupertinoPageRoute(
+                                builder: (_) => const User_Permission(),
                               ),
                             );
                           },
@@ -157,7 +172,6 @@ class _king extends State<king> {
                     ),
 
                     Divider(),
-
                     ListTile(
                       leading: Icon(Icons.logout_outlined),
                       title: Text("log out"),
