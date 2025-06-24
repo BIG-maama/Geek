@@ -1,14 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pro/BottomNavigator/DashBoard/Dashboard.dart';
+import 'package:pro/BottomNavigator/Medicines/Brand_med.dart';
 import 'package:pro/BottomNavigator/Medicines/Medicines.dart';
+import 'package:pro/BottomNavigator/Medicines/Shape_med.dart';
 import 'package:pro/BottomNavigator/Suppliers/Suppliers.dart';
-import 'package:pro/Reigster/login_page.dart';
 import 'package:pro/Permission/user_permission.dart';
+import 'package:pro/Reigster/login_page.dart';
 import 'package:pro/Roles/users.dart';
+import 'package:pro/cubit/user_cubit.dart';
+import 'package:pro/cubit/user_state.dart';
 import 'package:pro/widget/Global.dart';
-import 'package:pro/widget/token.dart';
 
 class king extends StatefulWidget {
   const king({Key? key}) : super(key: key);
@@ -18,26 +21,6 @@ class king extends StatefulWidget {
 
 class _king extends State<king> {
   int currentIndex = 0;
-  Future<void> logout(BuildContext context) async {
-    final token = await tokenManager.getToken();
-    if (token != null) {
-      try {
-        final response = await http.post(
-          Uri.parse('$baseUrl/api/logout-user'),
-          headers: {'Authorization': 'Bearer $token'},
-        );
-        if (response.statusCode == 200) {
-        } else {
-          print("Logout failed: ${response.statusCode}");
-        }
-      } catch (e) {
-        print("Error during logout: $e");
-      }
-    }
-
-    await tokenManager.clearToken();
-    CustomNavigator.pushReplacement(context, LoginScreen());
-  }
 
   final List<Widget> pages = const [
     Dashboard(),
@@ -46,165 +29,173 @@ class _king extends State<king> {
   ];
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("hello")),
-      drawer: Drawer(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              DrawerHeader(
-                decoration: BoxDecoration(color: Colors.green.shade100),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Text(
-                    //   "name : ${UserData.currentUser!.name}",
-                    //   style: TextStyle(
-                    //     fontSize: 20,
-                    //     fontWeight: FontWeight.bold,
-                    //   ),
-                    // ),
-                    // SizedBox(height: 5),
-                    // Text(
-                    //   "email : ${UserData.currentUser!.email}",
-                    //   style: TextStyle(fontSize: 14),
-                    // ),
-                    // SizedBox(height: 5),
-                    // Text(
-                    //   "phone : ${UserData.currentUser!.phone}",
-                    //   style: TextStyle(fontSize: 14),
-                    // ),
-                    // SizedBox(height: 5),
-                    // Text(
-                    //   "gender : ${UserData.currentUser!.gender}",
-                    //   style: TextStyle(fontSize: 14),
-                    // ),
-                    // SizedBox(height: 5),
-                    // Text(
-                    //   "created_at : ${UserData.currentUser!.date}",
-                    //   style: TextStyle(fontSize: 14),
-                    // ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.all(29),
-                child: Wrap(
-                  runSpacing: 15,
-                  children: [
-                    // ExpansionTile(
-                    //   leading: Icon(Icons.supervised_user_circle),
-                    //   title: Text("mange users"),
-                    //   children: [
-                    //     ListTile(
-                    //       title: Text('users'),
-                    //       onTap: () {
-                    //         Navigator.push(
-                    //           context,
-                    //           MaterialPageRoute(
-                    //             builder: (_) => UserManagementPage(),
-                    //           ),
-                    //         );
-                    //       },
-                    //     ),
-                    //     ListTile(
-                    //       title: Text('permission'),
-                    //       onTap: () {
-                    //         // FancySnackBar.showSnackBar(
-                    //         //   context: context,
-                    //         //   snackBarType: FancySnackBarType.success,
-                    //         //   title: "نجاح",
-                    //         //   message: "تم تنفيذ العملية بنجاح!",
-                    //         //   duration: 2,
-                    //         // );
-                    //         // FancySnackbar.show(
-                    //         //   context,
-                    //         //   AssetsPath.success,
-                    //         //   logo: Text("success"),
-                    //         // );
-                    //         // BotToast.showText(
-                    //         //   text: "عملية ناجحة!",
-                    //         //   duration: Duration(seconds: 2),
-                    //         //   contentColor: Colors.green,
-                    //         // );
-                    //         Navigator.push(
-                    //           context,
-                    //           MaterialPageRoute(
-                    //             builder: (_) => User_Permission(),
-                    //           ),
-                    //         );
-                    //       },
-                    //     ),
-                    //   ],
-                    // ),
-                    CupertinoExpansionTileAnimated(
-                      leading: const Icon(CupertinoIcons.settings),
-                      title: const Text("إعدادات المستخدم"),
+    return BlocConsumer<UserCubit, UserState>(
+      listener: (context, state) {
+        if (state is UserFailure) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
+        }
+        if (state is UserSuccess)
+          //      Future.microtask(() {
+          CustomNavigator.push(
+            context,
+            BlocProvider.value(
+              value: context.read<UserCubit>(),
+              child: LoginScreen(),
+            ),
+          );
+        // });
+        //  }
+      },
+      builder: (context, state) {
+        final cubit = context.read<UserCubit>();
+        return Scaffold(
+          appBar: AppBar(title: Text("hello")),
+          drawer: Drawer(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  DrawerHeader(
+                    decoration: BoxDecoration(color: Colors.green.shade100),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        CupertinoButton(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          color: CupertinoColors.systemGrey5,
-                          child: const Text("المستخدمين"),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              CupertinoPageRoute(
-                                builder: (_) => UserManagementPage(),
+                        // Text(
+                        //   "name : ${UserData.currentUser!.name}",
+                        //   style: TextStyle(
+                        //     fontSize: 20,
+                        //     fontWeight: FontWeight.bold,
+                        //   ),
+                        // ),
+                        // SizedBox(height: 5),
+                        // Text(
+                        //   "email : ${UserData.currentUser!.email}",
+                        //   style: TextStyle(fontSize: 14),
+                        // ),
+                        // SizedBox(height: 5),
+                        // Text(
+                        //   "phone : ${UserData.currentUser!.phone}",
+                        //   style: TextStyle(fontSize: 14),
+                        // ),
+                        // SizedBox(height: 5),
+                        // Text(
+                        //   "gender : ${UserData.currentUser!.gender}",
+                        //   style: TextStyle(fontSize: 14),
+                        // ),
+                        // SizedBox(height: 5),
+                        // Text(
+                        //   "created_at : ${UserData.currentUser!.date}",
+                        //   style: TextStyle(fontSize: 14),
+                        // ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(29),
+                    child: Wrap(
+                      runSpacing: 15,
+                      children: [
+                        CupertinoExpansionTileAnimated(
+                          leading: const Icon(CupertinoIcons.settings),
+                          title: const Text("إعدادات المستخدم"),
+                          children: [
+                            CupertinoButton(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
                               ),
-                            );
-                          },
+                              color: CupertinoColors.systemGrey5,
+                              child: const Text("المستخدمين"),
+                              onPressed: () {
+                                CustomNavigator.push(
+                                  context,
+                                  UserManagementPage(),
+                                );
+                              },
+                            ),
+                            CupertinoButton(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
+                              color: CupertinoColors.systemGrey5,
+                              child: const Text("الصلاحيات"),
+                              onPressed: () {
+                                CustomNavigator.push(
+                                  context,
+                                  User_Permission(),
+                                );
+                              },
+                            ),
+                          ],
                         ),
-                        CupertinoButton(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          color: CupertinoColors.systemGrey5,
-                          child: const Text("الصلاحيات"),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              CupertinoPageRoute(
-                                builder: (_) => const User_Permission(),
+                        Divider(),
+                        CupertinoExpansionTileAnimated(
+                          leading: const Icon(CupertinoIcons.settings),
+                          title: const Text("اعدادات الدواء "),
+                          children: [
+                            CupertinoButton(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
                               ),
-                            );
-                          },
+                              color: CupertinoColors.systemGrey5,
+                              child: const Text("شكل الدواء"),
+                              onPressed: () {
+                                CustomNavigator.push(
+                                  context,
+                                  MedicineFormsPage(),
+                                );
+                              },
+                            ),
+                            CupertinoButton(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
+                              color: CupertinoColors.systemGrey5,
+                              child: const Text("الشركة المصنعة للدواء"),
+                              onPressed: () {
+                                CustomNavigator.push(context, BrandsPage());
+                              },
+                            ),
+                          ],
+                        ),
+                        Divider(),
+                        ListTile(
+                          leading: Icon(Icons.logout_outlined),
+                          title: Text("log out"),
+                          onTap:
+                              state is UserLoading
+                                  ? null
+                                  : () => cubit.signOut(),
                         ),
                       ],
                     ),
-
-                    Divider(),
-                    ListTile(
-                      leading: Icon(Icons.logout_outlined),
-                      title: Text("log out"),
-                      onTap: () {
-                        logout(context);
-                      },
-                    ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          body: pages[currentIndex],
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: currentIndex,
+            onTap: (index) => setState(() => currentIndex = index),
+            items: [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.dashboard_rounded),
+                label: "Dashborad",
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.medical_services_outlined),
+                label: "Medicines",
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.support_agent_rounded),
+                label: "Suppliers",
               ),
             ],
           ),
-        ),
-      ),
-      body: pages[currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: currentIndex,
-        onTap: (index) => setState(() => currentIndex = index),
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_rounded),
-            label: "Dashborad",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.medical_services_outlined),
-            label: "Medicines",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.support_agent_rounded),
-            label: "Suppliers",
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

@@ -1,8 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:pro/Reigster/Rigster.dart';
-import 'package:pro/widget/token.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({Key? key}) : super(key: key);
@@ -11,37 +8,6 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreen extends State<WelcomeScreen> {
-  String? _token;
-  String? _errorMessage;
-
-  // Future<void> _signInWithGoogle() async {
-  //   final url = "http://192.168.1.9:8000/api/auth/google";
-  //   try {
-  //     if (await canLaunch(url)) {
-  //       await launch(url); // فتح واجهة Google OAuth
-  //       // بعد اختيار الحساب، توقع الرد من API الثانية
-  //       final callbackUrl = "http://192.168.1.9:8000/api/auth/google/callback";
-  //       final response = await http.get(Uri.parse(callbackUrl));
-  //       if (response.statusCode == 200) {
-  //         final data = json.decode(response.body);
-
-  //         setState(() {
-  //           _token = data['token'];
-  //           _errorMessage = null;
-  //         });
-  //         await tokenManager.saveToken(_token!);
-  //         print("sucsses");
-  //       } else {
-  //         print(_errorMessage = "Error: ${response.body}");
-  //       }
-  //     } else {
-  //       print(_errorMessage = "Cannot launch URL. Check your configuration.");
-  //     }
-  //   } catch (e) {
-  //     print(_errorMessage = "Error: $e");
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -122,44 +88,8 @@ class _WelcomeScreen extends State<WelcomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF06DE87),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      onPressed: () async {
-                        // await _signInWithGoogle();
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // نص الزر
-                          const Text(
-                            'التسجيل من خلال حساب غوغل ',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                            ),
-                          ),
-                          // أيقونة Google
-                          Image.asset(
-                            "images/google.png",
-                            width: 28,
-                            height: 28,
-                          ),
-                          const SizedBox(width: 10),
-                        ],
-                      ),
-                    ),
-                  ),
 
+                  //
                   const SizedBox(height: 20),
 
                   // نص الشروط

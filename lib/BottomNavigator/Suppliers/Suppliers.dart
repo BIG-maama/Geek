@@ -33,7 +33,8 @@ class SuppliersPage extends StatelessWidget {
     if (response.statusCode == 200 || response.statusCode == 201) {
       final data = response.data;
       BotToast.showText(
-        text: data['message'],
+        text: (data['message'] as String?) ?? 'تم الحذف بنجاح',
+
         duration: Duration(seconds: 2),
         contentColor: Colors.teal,
       );

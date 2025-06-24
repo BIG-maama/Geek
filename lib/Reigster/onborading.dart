@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pro/Reigster/start.dart';
+import 'package:pro/widget/Global.dart';
 
 class SkipScreen extends StatelessWidget {
   const SkipScreen({Key? key}) : super(key: key);
@@ -39,10 +40,7 @@ class SkipScreen extends StatelessWidget {
                 ),
 
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => WelcomeScreen()),
-                  );
+                  CustomNavigator.push(context, WelcomeScreen());
                 },
               ),
             ),

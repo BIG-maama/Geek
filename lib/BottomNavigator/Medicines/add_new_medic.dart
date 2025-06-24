@@ -27,13 +27,33 @@ class _AddMedicineModernState extends State<AddMedicineModern> {
   final peoplePrice = TextEditingController();
   final supplierPrice = TextEditingController();
   final taxRate = TextEditingController();
-  final expiry_date = TextEditingController();
+  final medicineform = TextEditingController();
 
   List<File> selectedFiles = [];
   bool isLoading = false;
-
   List<dynamic> medicineForms = [];
+  List<dynamic> medicineBrands = [];
+  Map<String, dynamic>? selectedBrand;
   Map<String, dynamic>? selectedForm;
+
+  Future<void> fetchBrandBrand() async {
+    try {
+      final response = await Dio().get("$baseUrl/api/brands");
+      print(response);
+      if (response.statusCode == 200) {
+        final responsedata = response.data;
+        setState(() {
+          medicineBrands = responsedata['data'];
+          selectedBrand =
+              medicineBrands.isNotEmpty
+                  ? medicineBrands.first
+                  : null; // اختيار أول عنصر كبداية
+        });
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 
   Future<void> fetchMedicineForms() async {
     try {
@@ -52,6 +72,7 @@ class _AddMedicineModernState extends State<AddMedicineModern> {
   void initState() {
     super.initState();
     fetchMedicineForms();
+    fetchBrandBrand();
   }
 
   Future<String?> generateCode() async {
@@ -98,8 +119,9 @@ class _AddMedicineModernState extends State<AddMedicineModern> {
       MapEntry("people_price", peoplePrice.text),
       MapEntry("supplier_price", supplierPrice.text),
       MapEntry("tax_rate", taxRate.text),
-      MapEntry("expiry_date", expiry_date.text),
+      MapEntry("expiry_date", medicineform.text),
       MapEntry("medicine_form_id", selectedForm?['id'].toString() ?? ''),
+      MapEntry("brand_id", selectedBrand?['id'].toString() ?? ''),
     ]);
 
     for (File file in selectedFiles) {
@@ -194,12 +216,46 @@ class _AddMedicineModernState extends State<AddMedicineModern> {
 
               const SizedBox(height: 20),
               _glassCard(
-                title: "expiry time",
+                title: "Brand and Shape",
                 children: [
-                  _buildField(
-                    expiry_date,
-                    "expiry date of medic",
-                    TextInputType.datetime,
+                  Text(
+                    "اختر  البراند",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  DropdownButtonFormField<Map<String, dynamic>>(
+                    value: selectedBrand,
+                    isExpanded: true,
+                    dropdownColor: Colors.black87,
+                    style: const TextStyle(color: Colors.white),
+                    iconEnabledColor: Colors.white,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white.withOpacity(0.1),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    items:
+                        medicineBrands
+                            .map<DropdownMenuItem<Map<String, dynamic>>>(
+                              (form) => DropdownMenuItem(
+                                value: form,
+                                child: Text(
+                                  form['name'],
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedBrand = value;
+                      });
+                    },
                   ),
                   const SizedBox(height: 12),
                   Text(

@@ -1,9 +1,13 @@
 import 'package:bot_toast/bot_toast.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pro/BottomNavigator/Medicines/medic_&_catg_info.dart';
 import 'package:pro/BottomNavigator/Suppliers/supplier_profile.dart';
+import 'package:pro/core/api/dio_consumer.dart';
+import 'package:pro/cubit/user_cubit.dart';
 import 'package:pro/home.dart';
 
 void main() async {
@@ -33,7 +37,10 @@ class MyApp extends StatelessWidget {
       navigatorObservers: [BotToastNavigatorObserver()],
       title: 'Flutter App',
       theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'Almarai'),
-      home: king(),
+      home: BlocProvider(
+        create: (_) => UserCubit(DioConsumer(dio: Dio())),
+        child: king(),
+      ),
       debugShowCheckedModeBanner: false,
     );
   }
@@ -44,59 +51,97 @@ class MyApp extends StatelessWidget {
 
 
 
-//http://localhost:8000/api/show-all-alternatives/1
 
-//  {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// http://localhost:8000/api/brands
+// {
 //     "status": true,
-//     "status_code": 200,
-//     "message": "تم جلب الأدوية البديلة بنجاح",
+//     "message": "Brand created successfully",
 //     "data": {
-//         "medicine": {
-//             "id": 1,
-//             "name": "ddddddq",
-//             "scientific_name": null,
-//             "arabic_name": "sdsdsdsl",
-//             "barcode": "12121213"
-//         },
-//         "alternatives": [
-//             {
-//                 "id": 2,
-//                 "name": "dddd",
-//                 "scientific_name": null,
-//                 "arabic_name": "sdsds",
-//                 "barcode": "12121215",
-//                 "type": "unit",
-//                 "quantity": 12,
-//                 "prices": {
-//                     "people_price": "22.00",
-//                     "supplier_price": "44.00"
-//                 },
-//                 "category": {
-//                     "id": 1,
-//                     "name": "مسكنات"
-//                 }
-//             },
-//             {
-//                 "id": 3,
-//                 "name": "ddddtt",
-//                 "scientific_name": null,
-//                 "arabic_name": "sdsdsyy",
-//                 "barcode": "12121255",
-//                 "type": "unit",
-//                 "quantity": 12,
-//                 "prices": {
-//                     "people_price": "22.00",
-//                     "supplier_price": "44.00"
-//                 },
-//                 "category": {
-//                     "id": 1,
-//                     "name": "مسكنات"
-//                 }
-//             }
-//         ]
-//     },
-//     "meta": {
-//         "total_alternatives": 2
+//         "name": "soso Brand",
+//         "company_name": "Al-Damas",
+//         "description": "Empty",
+//         "updated_at": "2025-06-16T15:22:50.000000Z",
+//         "created_at": "2025-06-16T15:22:50.000000Z",
+//         "id": 3
 //     }
 // }
 
+//********************************************************************************************************************** */
+
+
+//http://localhost:8000/api/brands
+// {
+//     "status": true,
+//     "data": [
+//         {
+//             "id": 1,
+//             "name": "paracetamol Brand",
+//             "description": "Empty",
+//             "company_name": "AL_HAKEM",
+//             "created_at": "2025-06-16T15:22:12.000000Z",
+//             "updated_at": "2025-06-16T15:22:12.000000Z"
+//         },
+//         {
+//             "id": 2,
+//             "name": "farma Brand",
+//             "description": "Empty",
+//             "company_name": "Al_Raqa",
+//             "created_at": "2025-06-16T15:22:30.000000Z",
+//             "updated_at": "2025-06-16T15:22:30.000000Z"
+//         },
+//         {
+//             "id": 3,
+//             "name": "soso Brand",
+//             "description": "Empty",
+//             "company_name": "Al-Damas",
+//             "created_at": "2025-06-16T15:22:50.000000Z",
+//             "updated_at": "2025-06-16T15:22:50.000000Z"
+//         }
+//     ]
+// }
+
+//*********************************************************************************************************** */
+
+
+//http://localhost:8000/api/brands/1
+// {
+//     "status": true,
+//     "data": {
+//         "id": 1,
+//         "name": "paracetamol Brand",
+//         "description": "Empty",
+//         "company_name": "AL_HAKEM",
+//         "created_at": "2025-06-16T15:22:12.000000Z",
+//         "updated_at": "2025-06-16T15:22:12.000000Z"
+//     }
+// }
+
+//**************************************************************************************************************** */
+//http://localhost:8000/api/brands/1
+// {
+//     "status": true,
+//     "message": "Brand deleted successfully"
+// }

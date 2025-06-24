@@ -146,9 +146,6 @@ class MedicInfo extends HiveObject {
   @HiveField(5)
   String alertQuantity;
 
-  @HiveField(6)
-  String expiryDate;
-
   @HiveField(7)
   int id;
 
@@ -174,7 +171,6 @@ class MedicInfo extends HiveObject {
     required this.type,
     required this.quantity,
     required this.alertQuantity,
-    required this.expiryDate,
     required this.id,
     required this.attachments,
     required this.prices,
@@ -193,7 +189,6 @@ class MedicInfo extends HiveObject {
       type: medicine['type'] ?? '',
       quantity: medicine['quantity']?.toString() ?? '0',
       alertQuantity: medicine['alert_quantity']?.toString() ?? '0',
-      expiryDate: medicine['expiry_date'] ?? '',
       id: medicine['id'] ?? 0,
       attachments: json['attachments'] ?? [],
       prices: Prices.fromJson(medicine['prices'] ?? {}),
@@ -211,11 +206,11 @@ class MedicInfo extends HiveObject {
 //     "status": true,
 //     "status_code": 200,
 //     "medicine": {
-//         "id": 6,
-//         "name": "hhslsmms",
+//         "id": 1,
+//         "name": "hhslhhv",
 //         "scientific_name": null,
-//         "arabic_name": "fgfgdgds",
-//         "barcode": "1214422",
+//         "arabic_name": "fgfgdgdhhhuu",
+//         "barcode": "12121212",
 //         "type": "unit",
 //         "quantity": "12",
 //         "alert_quantity": "4",
@@ -224,15 +219,15 @@ class MedicInfo extends HiveObject {
 //             "people_price": "22",
 //             "tax_rate": "3"
 //         },
-//         "expiry_date": "2025-06-04",
+//         "expiry_date": null,
 //         "category": {
 //             "id": 1,
-//             "name": "google"
+//             "name": "مسكنات"
 //         },
 //         "medicine_form": {
 //             "id": 1,
-//             "name": "ابر",
-//             "description": "ابر"
+//             "name": "ji",
+//             "description": "اقراص"
 //         },
 //         "status": {
 //             "is_low": false,
@@ -241,13 +236,6 @@ class MedicInfo extends HiveObject {
 //             "is_expiring_soon": false
 //         }
 //     },
-//     "attachments": [
-//         {
-//             "id": 6,
-//             "file_name": "Screenshot 2025-03-25 213038.png",
-//             "file_path": "medicine-attachments/34qNoN5xhDY7AqzrImVG.png",
-//             "full_url": "http://192.168.1.103:8000/storage/medicine-attachments/34qNoN5xhDY7AqzrImVG.png"
-//         }
-//     ],
+//     "attachments": [],
 //     "message": "تم إضافة الدواء والمرفقات بنجاح"
 // }

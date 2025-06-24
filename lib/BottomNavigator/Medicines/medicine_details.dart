@@ -170,8 +170,6 @@ class _MedicineDetailsPageState extends State<MedicineDetailsPage> {
             ),
             _buildInfoTile("📉 الضريبة:", "${med.prices.taxRate}%"),
             _buildInfoTile("🆔 رقم المعرف:", med.id.toString()),
-            //_buildInfoTile("📆 تاريخ الإنشاء:", med.),
-            _buildInfoTile("📅 تاريخ الانتهاء:", med.expiryDate),
             _buildInfoTile("📁 مرفقات:", "${med.attachments.length} عنصر"),
           ],
         ),

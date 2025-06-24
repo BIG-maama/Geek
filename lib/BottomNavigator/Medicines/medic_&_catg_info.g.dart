@@ -226,7 +226,6 @@ class MedicInfoAdapter extends TypeAdapter<MedicInfo> {
       type: fields[3] as String,
       quantity: fields[4] as String,
       alertQuantity: fields[5] as String,
-      expiryDate: fields[6] as String,
       id: fields[7] as int,
       attachments: (fields[8] as List).cast<dynamic>(),
       prices: fields[9] as Prices,
@@ -239,7 +238,7 @@ class MedicInfoAdapter extends TypeAdapter<MedicInfo> {
   @override
   void write(BinaryWriter writer, MedicInfo obj) {
     writer
-      ..writeByte(13)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
@@ -252,8 +251,6 @@ class MedicInfoAdapter extends TypeAdapter<MedicInfo> {
       ..write(obj.quantity)
       ..writeByte(5)
       ..write(obj.alertQuantity)
-      ..writeByte(6)
-      ..write(obj.expiryDate)
       ..writeByte(7)
       ..write(obj.id)
       ..writeByte(8)
