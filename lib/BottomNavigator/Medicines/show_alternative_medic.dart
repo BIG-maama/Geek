@@ -30,8 +30,9 @@ class _AlternativeMedicinesPageState extends State<AlternativeMedicinesPage> {
       final response = await Dio().get(
         "$baseUrl/api/show-all-alternatives/${widget.medicineId}",
       );
-
-      if (response.statusCode == 200 && response.data['status'] == true) {
+      print(response.data);
+      if (response.statusCode == 200) {
+        print(response.data);
         setState(() {
           medicine = response.data['data']['medicine'];
           meta = response.data['meta'];
@@ -67,9 +68,11 @@ class _AlternativeMedicinesPageState extends State<AlternativeMedicinesPage> {
                     if (medicine != null)
                       CupertinoListTile.notched(
                         title: Text(
-                          "🧪 ${medicine!['name'] ?? medicine!['arabic_name']}",
+                          "🧪 ${medicine!['scientific_name'] ?? 'بدون اسم'}",
                         ),
-                        subtitle: Text("الباركود: ${medicine!['barcode']}"),
+                        subtitle: Text(
+                          "الباركود: ${medicine!['barcode'] ?? 'غير متوفر'}",
+                        ),
                       ),
                     const Padding(
                       padding: EdgeInsets.all(30.0),
@@ -78,9 +81,13 @@ class _AlternativeMedicinesPageState extends State<AlternativeMedicinesPage> {
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
+                    if (alternatives.isEmpty)
+                      const Center(child: Text("لا توجد بدائل متاحة حالياً")),
                     ...alternatives.map((alt) {
                       return CupertinoListTile(
-                        title: Text("🔁 ${alt['arabic_name'] ?? alt['name']}"),
+                        title: Text(
+                          "🔁 ${alt['arabic_name'] ?? alt['name'] ?? 'اسم غير متوفر'}",
+                        ),
                         subtitle: Text(
                           "السعر: ${alt['prices']['people_price']} | الكمية: ${alt['quantity']}",
                         ),
@@ -89,11 +96,69 @@ class _AlternativeMedicinesPageState extends State<AlternativeMedicinesPage> {
                         ),
                       );
                     }).toList(),
-                    SizedBox(height: 20),
-                    Center(child: Text(meta?['total_alternatives'])),
+                    const SizedBox(height: 20),
+                    if (meta?['total_alternatives'] != null)
+                      Center(
+                        child: Text(
+                          "الإجمالي: ${meta?['total_alternatives'].toString()} بدائل",
+                        ),
+                      ),
                   ],
                 ),
       ),
     );
   }
 }
+
+
+
+
+// {
+//     "status": true,
+//     "status_code": 200,
+//     "message": "✅ تم جلب الأدوية البديلة بنجاح!",
+//     "data": {
+//         "medicine": {
+//             "id": 1,
+//             "scientific_name": null,
+//             "barcode": "12121211"
+//         },
+//         "alternatives": [
+//             {
+//                 "id": 2,
+//                 "name": "hhslhhvssfwسswsssss",
+//                 "scientific_name": null,
+//                 "barcode": "12121212",
+//                 "type": "unit",
+//                 "quantity": 12,
+//                 "prices": {
+//                     "people_price": "22.00",
+//                     "supplier_price": "44.00"
+//                 },
+//                 "category": {
+//                     "name": "عطور",
+//                     "id": 1
+//                 }
+//             },
+//             {
+//                 "id": 3,
+//                 "name": "hhslhhvssfwسswsssssw",
+//                 "scientific_name": null,
+//                 "barcode": "12121213",
+//                 "type": "unit",
+//                 "quantity": 12,
+//                 "prices": {
+//                     "people_price": "22.00",
+//                     "supplier_price": "44.00"
+//                 },
+//                 "category": {
+//                     "name": "عطور",
+//                     "id": 1
+//                 }
+//             }
+//         ]
+//     },
+//     "meta": {
+//         "total_alternatives": 2
+//     }
+// }

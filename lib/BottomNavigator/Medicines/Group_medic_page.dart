@@ -76,7 +76,7 @@ class _GroupedMedicinesCupertinoPageState
                               },
                               trailing: CupertinoButton(
                                 padding: EdgeInsets.zero,
-                                onPressed: () async {
+                                onPressed: () {
                                   CustomNavigator.push(
                                     context,
                                     AlternativeMedicinesPage(

@@ -33,13 +33,30 @@ class _AddMedicineModernState extends State<AddMedicineModern> {
   bool isLoading = false;
   List<dynamic> medicineForms = [];
   List<dynamic> medicineBrands = [];
+  List<dynamic> medicinecategory = [];
   Map<String, dynamic>? selectedBrand;
+  Map<String, dynamic>? selectedCategory;
   Map<String, dynamic>? selectedForm;
+  Future<void> category() async {
+    try {
+      final response = await Dio().get('$baseUrl/api/medicines/categories');
+      if (response.statusCode == 200) {
+        final responseData = response.data;
+        setState(() {
+          medicinecategory = responseData['data'];
+          selectedCategory =
+              medicinecategory.isNotEmpty ? medicinecategory.first : null;
+        });
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 
   Future<void> fetchBrandBrand() async {
     try {
       final response = await Dio().get("$baseUrl/api/brands");
-      print(response);
+
       if (response.statusCode == 200) {
         final responsedata = response.data;
         setState(() {
@@ -73,6 +90,7 @@ class _AddMedicineModernState extends State<AddMedicineModern> {
     super.initState();
     fetchMedicineForms();
     fetchBrandBrand();
+    category();
   }
 
   Future<String?> generateCode() async {
@@ -113,7 +131,7 @@ class _AddMedicineModernState extends State<AddMedicineModern> {
       MapEntry("arabic_name", arabicName.text),
       MapEntry("bar_code", barcode.text),
       MapEntry("type", type.text),
-      MapEntry("category_id", categoryId.text),
+      MapEntry("category_id", selectedCategory?['id'].toString() ?? ''),
       MapEntry("quantity", quantity.text),
       MapEntry("alert_quantity", alertQuantity.text),
       MapEntry("people_price", peoplePrice.text),
@@ -190,8 +208,8 @@ class _AddMedicineModernState extends State<AddMedicineModern> {
                       }
                     },
                   ),
-                  _buildField(type, "النوع", TextInputType.text),
-                  _buildField(categoryId, "رقم الفئة", TextInputType.number),
+                  _buildTypeDropdown(type),
+                  _buildCategoryDropdown(),
                 ],
               ),
               const SizedBox(height: 20),
@@ -436,6 +454,83 @@ class _AddMedicineModernState extends State<AddMedicineModern> {
             borderRadius: BorderRadius.circular(10),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTypeDropdown(TextEditingController typeController) {
+    final List<String> types = ['unit', 'package'];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: DropdownButtonFormField<String>(
+        value: typeController.text.isNotEmpty ? typeController.text : null,
+        isExpanded: true, // 💡 توسع القائمة على كامل العرض
+        style: const TextStyle(color: Colors.white),
+        dropdownColor: Colors.black87,
+        iconEnabledColor: Colors.white,
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: Colors.white.withOpacity(0.1),
+          hintText: 'اختر النوع',
+          hintStyle: const TextStyle(color: Colors.white70),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+        ),
+        items:
+            types.map((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value, style: const TextStyle(color: Colors.white)),
+              );
+            }).toList(),
+        onChanged: (value) {
+          if (value != null) {
+            typeController.text = value;
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _buildCategoryDropdown() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: DropdownButtonFormField<Map<String, dynamic>>(
+        value: selectedCategory,
+        isExpanded: true,
+        dropdownColor: Colors.black87,
+        style: const TextStyle(color: Colors.white),
+        iconEnabledColor: Colors.white,
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: Colors.white.withOpacity(0.1),
+          hintText: 'اختر الفئة',
+          hintStyle: const TextStyle(color: Colors.white70),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+        ),
+        items:
+            medicinecategory
+                .map<DropdownMenuItem<Map<String, dynamic>>>(
+                  (category) => DropdownMenuItem(
+                    value: category,
+                    child: Text(
+                      category['name'],
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                )
+                .toList(),
+        onChanged: (value) {
+          setState(() {
+            selectedCategory = value;
+          });
+        },
       ),
     );
   }

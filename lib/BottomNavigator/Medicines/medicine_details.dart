@@ -17,17 +17,41 @@ class MedicineDetailsPage extends StatefulWidget {
 }
 
 class _MedicineDetailsPageState extends State<MedicineDetailsPage> {
+  late MedicInfo med;
+  bool isLoading = false;
+  bool _pressed = false;
   List<int> selectedAlternativeIds = [];
+
+  @override
+  void initState() {
+    super.initState();
+    med = widget.medicine;
+    fetchMedicineDetails();
+  }
+
+  Future<void> fetchMedicineDetails() async {
+    setState(() => isLoading = true);
+    try {
+      final response = await Dio().get("$baseUrl/api/medicines/${med.id}");
+      if (response.statusCode == 200 && response.data['status'] == true) {
+        final updated = response.data['data'];
+        setState(() {
+          med = MedicInfo.fromJson(updated);
+        });
+      }
+    } catch (e) {
+      print("خطأ في جلب التفاصيل: $e");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
 
   Future<void> deleteMedicine(BuildContext context) async {
     try {
       final response = await Dio().delete(
         "$baseUrl/api/medicines/${widget.medicine.id}",
       );
-
       if (response.statusCode == 200) {
-        await widget.medicine.delete();
-        Navigator.of(context).pop();
         FancySnackbar.show(
           context,
           "تم حذف الدواء بنجاح",
@@ -36,6 +60,8 @@ class _MedicineDetailsPageState extends State<MedicineDetailsPage> {
           textColor: Colors.white,
           logo: const Icon(CupertinoIcons.delete_solid),
         );
+        await widget.medicine.delete();
+        Navigator.pop(context);
       } else {
         print("فشل الحذف");
       }
@@ -73,9 +99,9 @@ class _MedicineDetailsPageState extends State<MedicineDetailsPage> {
 
   void showAlternativeSelectionDialog() async {
     final allMedicines =
-        Hive.box<MedicInfo>('medics').values
-            .where((med) => med.id != widget.medicine.id) //
-            .toList();
+        Hive.box<MedicInfo>(
+          'medics',
+        ).values.where((m) => m.id != widget.medicine.id).toList();
 
     await showCupertinoModalPopup(
       context: context,
@@ -115,9 +141,9 @@ class _MedicineDetailsPageState extends State<MedicineDetailsPage> {
           actions: [
             CupertinoDialogAction(
               child: const Text("إرسال البدائل"),
-              onPressed: () {
+              onPressed: () async {
                 Navigator.pop(context);
-                sendAlternativeMedicines();
+                await sendAlternativeMedicines();
               },
             ),
             CupertinoDialogAction(
@@ -135,56 +161,279 @@ class _MedicineDetailsPageState extends State<MedicineDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final med = widget.medicine;
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: const Text('تفاصيل الدواء'),
-        trailing: AnimatedPopupMenu(
-          onEdit: showAlternativeSelectionDialog,
-          onDelete: () {
-            AlertHelper.showConfirmationDialog(
-              context: context,
-              title: "حذف",
-              message: "هل أنت متأكد أنك تريد حذف هذا الدواء؟",
-              onConfirm: () async {
-                await deleteMedicine(context);
-              },
-            );
-          },
+        trailing: GestureDetector(
+          onTapDown: (_) => setState(() => _pressed = true),
+          onTapUp: (_) => setState(() => _pressed = false),
+          onTapCancel: () => setState(() => _pressed = false),
+          onTap: () => _showActionsSheet(context),
+          child: AnimatedScale(
+            scale: _pressed ? 0.85 : 1.0,
+            duration: const Duration(milliseconds: 150),
+            child: const Icon(CupertinoIcons.ellipsis),
+          ),
         ),
       ),
       child: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            _buildInfoTile("💊 اسم الدواء:", med.name),
-            _buildInfoTile("📝 الاسم بالعربية:", med.arabicName),
-            _buildInfoTile("📦 النوع:", med.type),
-            _buildInfoTile("📇 باركود:", med.barcode),
-            _buildInfoTile("🔢 الكمية:", med.quantity),
-            _buildInfoTile("⚠️ الكمية الحرجة:", med.alertQuantity),
-            _buildInfoTile("💰 سعر البيع:", med.prices.peoplePrice.toString()),
-            _buildInfoTile(
-              "🛒 سعر المورد:",
-              med.prices.supplierPrice.toString(),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 500),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                CupertinoColors.systemGroupedBackground,
+                _getMainColor(),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-            _buildInfoTile("📉 الضريبة:", "${med.prices.taxRate}%"),
-            _buildInfoTile("🆔 رقم المعرف:", med.id.toString()),
-            _buildInfoTile("📁 مرفقات:", "${med.attachments.length} عنصر"),
-          ],
+          ),
+          child:
+              isLoading
+                  ? const Center(child: CupertinoActivityIndicator())
+                  : CustomScrollView(
+                    slivers: [
+                      CupertinoSliverRefreshControl(
+                        onRefresh: fetchMedicineDetails,
+                      ),
+                      SliverToBoxAdapter(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const SizedBox(height: 16),
+                            _animatedSection(
+                              _buildSection(
+                                context,
+                                "💊 معلومات عامة",
+                                children: [
+                                  _infoTile("الاسم", med.name),
+                                  _infoTile("الاسم بالعربية", med.arabicName),
+                                  _infoTile("الباركود", med.barcode),
+                                  _infoTile("النوع", med.type),
+                                  _infoTile("الكمية", med.quantity.toString()),
+                                  _infoTile(
+                                    "الكمية الحرجة",
+                                    med.alertQuantity.toString(),
+                                  ),
+                                ],
+                              ),
+                              delay: 200,
+                            ),
+                            _animatedSection(
+                              _buildSection(
+                                context,
+                                "💰 الأسعار",
+                                children: [
+                                  _infoTile(
+                                    "سعر المورد",
+                                    "${med.prices.supplierPrice}",
+                                  ),
+                                  _infoTile(
+                                    "سعر البيع",
+                                    "${med.prices.peoplePrice}",
+                                  ),
+                                  _infoTile(
+                                    "الضريبة",
+                                    "${med.prices.taxRate}%",
+                                  ),
+                                ],
+                              ),
+                              delay: 400,
+                            ),
+                            _animatedSection(
+                              _buildSection(
+                                context,
+                                "📁 التصنيفات",
+                                children: [
+                                  _infoTile("القسم", med.category.name),
+                                  _infoTile("الشكل", med.medicineForm.name),
+                                  _infoTile(
+                                    "الوصف",
+                                    med.medicineForm.description,
+                                  ),
+                                ],
+                              ),
+                              delay: 600,
+                            ),
+                            _animatedSection(
+                              _buildSection(
+                                context,
+                                "🧪 الحالة",
+                                children: [
+                                  _statusTile(
+                                    "منتهي الصلاحية",
+                                    med.status.isExpired,
+                                    activeColor: CupertinoColors.systemRed,
+                                  ),
+                                  _statusTile(
+                                    "قارب على الانتهاء",
+                                    med.status.isExpiringSoon,
+                                    activeColor: CupertinoColors.systemYellow,
+                                  ),
+                                  _statusTile(
+                                    "الكمية منخفضة",
+                                    med.status.isLow,
+                                    activeColor: CupertinoColors.systemOrange,
+                                  ),
+                                  _statusTile(
+                                    "نفذ من المخزون",
+                                    med.status.isOut,
+                                    activeColor: CupertinoColors.systemGrey,
+                                  ),
+                                ],
+                              ),
+                              delay: 800,
+                            ),
+                            const SizedBox(height: 24),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
         ),
       ),
     );
   }
-}
 
-Widget _buildInfoTile(String label, String value) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8),
-    child: CupertinoListTile(
-      title: Text(label),
+  void _showActionsSheet(BuildContext context) {
+    showCupertinoModalPopup(
+      context: context,
+      builder:
+          (_) => CupertinoActionSheet(
+            title: const Text("الخيارات"),
+            actions: [
+              CupertinoActionSheetAction(
+                onPressed: showAlternativeSelectionDialog,
+                child: const Text("تعديل"),
+              ),
+              CupertinoActionSheetAction(
+                isDestructiveAction: true,
+                onPressed: () async {
+                  await deleteMedicine(context);
+                  Navigator.pop(context);
+                },
+                child: const Text("حذف"),
+              ),
+            ],
+            cancelButton: CupertinoActionSheetAction(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("إلغاء"),
+            ),
+          ),
+    );
+  }
+
+  Widget _buildSection(
+    BuildContext context,
+    String title, {
+    required List<Widget> children,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: CupertinoListSection.insetGrouped(
+        header: Text(
+          title,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        children: children,
+      ),
+    );
+  }
+
+  Widget _infoTile(String title, String value) {
+    return CupertinoListTile(
+      title: Text(title),
       subtitle: Text(value.isNotEmpty ? value : "لا يوجد"),
-      leading: const Icon(CupertinoIcons.info),
-    ),
-  );
+      leading: const Icon(CupertinoIcons.info_circle),
+    );
+  }
+
+  Widget _statusTile(String title, bool value, {Color? activeColor}) {
+    final icon =
+        value
+            ? CupertinoIcons.check_mark_circled_solid
+            : CupertinoIcons.clear_circled;
+
+    return TweenAnimationBuilder<Color?>(
+      duration: const Duration(milliseconds: 500),
+      tween: ColorTween(
+        begin: CupertinoColors.systemGrey6,
+        end:
+            value
+                ? (activeColor ?? CupertinoColors.systemGreen).withOpacity(0.1)
+                : CupertinoColors.systemGrey6,
+      ),
+      builder: (context, color, _) {
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 500),
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              if (value)
+                BoxShadow(
+                  color: (activeColor ?? CupertinoColors.activeBlue)
+                      .withOpacity(0.15),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+            ],
+          ),
+          margin: const EdgeInsets.symmetric(vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                color:
+                    value
+                        ? (activeColor ?? CupertinoColors.activeGreen)
+                        : CupertinoColors.systemGrey,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color:
+                        value
+                            ? (activeColor ?? CupertinoColors.activeGreen)
+                            : CupertinoColors.systemGrey,
+                  ),
+                ),
+              ),
+              Text(
+                value ? "نعم" : "لا",
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _animatedSection(Widget child, {int delay = 0}) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeOut,
+      child: child,
+      builder: (context, value, child) {
+        return Transform.translate(
+          offset: Offset(0, (1 - value) * 20),
+          child: Opacity(opacity: value, child: child),
+        );
+      },
+    );
+  }
+
+  Color _getMainColor() {
+    if (med.status.isExpired)
+      return CupertinoColors.systemRed.withOpacity(0.05);
+    if (med.status.isLow) return CupertinoColors.systemYellow.withOpacity(0.05);
+    return CupertinoColors.systemGreen.withOpacity(0.05);
+  }
 }
