@@ -52,6 +52,12 @@ dependencies:
   multi_value_listenable_builder: ^0.0.2
   flutter_bloc: ^9.1.1
   bloc: ^9.0.0
+  image_sequence_animator: ^2.0.0
+  mobile_scanner: ^7.0.1
+  carousel_slider: ^5.1.1
+  percent_indicator: ^4.2.5
+  sensors_plus: ^6.1.1
+  page_transition: ^2.2.1
   
 
 dev_dependencies:
@@ -86,6 +92,7 @@ flutter:
    - images/back.png
    - images/email2.jpg
    - images/lock (1).jpg
+   - assets/frames/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

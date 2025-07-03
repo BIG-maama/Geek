@@ -97,6 +97,126 @@ class _MedicineDetailsPageState extends State<MedicineDetailsPage> {
     }
   }
 
+  void post_expired_med(int medicineId) async {
+    final quantityController = TextEditingController();
+    final reasonController = TextEditingController();
+    final notesController = TextEditingController();
+
+    await showCupertinoModalPopup(
+      context: context,
+      builder: (context) {
+        return CupertinoActionSheet(
+          title: const Text("تسجيل دواء تالف"),
+          message: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                CupertinoTextField(
+                  controller: quantityController,
+                  placeholder: "الكمية التالفة",
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: 10),
+                CupertinoTextField(
+                  controller: reasonController,
+                  placeholder: "السبب (مثلاً: منتهي الصلاحية)",
+                ),
+                const SizedBox(height: 10),
+                CupertinoTextField(
+                  controller: notesController,
+                  placeholder: "ملاحظات إضافية (اختياري)",
+                  maxLines: 3,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            CupertinoDialogAction(
+              child: const Text("إرسال"),
+              onPressed: () async {
+                Navigator.pop(context);
+
+                final int? quantity = int.tryParse(quantityController.text);
+                final String reason = reasonController.text.trim();
+                final String notes = notesController.text.trim();
+
+                if (quantity == null || reason.isEmpty) {
+                  showCupertinoDialog(
+                    context: context,
+                    builder:
+                        (context) => CupertinoAlertDialog(
+                          title: Text("تحذير"),
+                          content: Text("يرجى إدخال الكمية والسبب."),
+                          actions: [
+                            CupertinoDialogAction(
+                              child: Text("موافق"),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                          ],
+                        ),
+                  );
+                  return;
+                }
+
+                try {
+                  final response = await Dio().post(
+                    "$baseUrl/api/add-damaged-medicine",
+                    data: {
+                      "medicine_id": medicineId,
+                      "quantity_talif": quantity,
+                      "reason": reason,
+                      "notes": notes,
+                    },
+                  );
+
+                  if (response.statusCode == 201 &&
+                      response.data["status"] == "success") {
+                    showCupertinoDialog(
+                      context: context,
+                      builder:
+                          (context) => CupertinoAlertDialog(
+                            title: Text("تم بنجاح"),
+                            content: Text(response.data["message"]),
+                            actions: [
+                              CupertinoDialogAction(
+                                child: Text("موافق"),
+                                onPressed: () => Navigator.pop(context),
+                              ),
+                            ],
+                          ),
+                    );
+                  } else {
+                    throw Exception("فشل في الإرسال");
+                  }
+                } catch (e) {
+                  showCupertinoDialog(
+                    context: context,
+                    builder:
+                        (context) => CupertinoAlertDialog(
+                          title: Text("خطأ"),
+                          content: Text("فشل في الاتصال أو إرسال البيانات: $e"),
+                          actions: [
+                            CupertinoDialogAction(
+                              child: Text("إغلاق"),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                          ],
+                        ),
+                  );
+                }
+              },
+            ),
+            CupertinoDialogAction(
+              isDestructiveAction: true,
+              child: const Text("إلغاء"),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void showAlternativeSelectionDialog() async {
     final allMedicines =
         Hive.box<MedicInfo>(
@@ -306,6 +426,13 @@ class _MedicineDetailsPageState extends State<MedicineDetailsPage> {
               CupertinoActionSheetAction(
                 onPressed: showAlternativeSelectionDialog,
                 child: const Text("تعديل"),
+              ),
+              CupertinoActionSheetAction(
+                onPressed: () {
+                  Navigator.pop(context); // نغلق النافذة قبل فتح نافذة الإتلاف
+                  post_expired_med(widget.medicine.id); // تمرير معرف الدواء
+                },
+                child: Text("إتلاف الدواء"),
               ),
               CupertinoActionSheetAction(
                 isDestructiveAction: true,

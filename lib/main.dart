@@ -6,9 +6,7 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pro/BottomNavigator/Medicines/medic_&_catg_info.dart';
 import 'package:pro/BottomNavigator/Suppliers/supplier_profile.dart';
-import 'package:pro/core/api/dio_consumer.dart';
-import 'package:pro/cubit/user_cubit.dart';
-import 'package:pro/home.dart';
+import 'package:pro/widget/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,8 +20,9 @@ void main() async {
   Hive.registerAdapter(MedicInfoAdapter());
   await Hive.openBox<SupplierProfile>('suppliers');
   await Hive.openBox<CategoryInfo>('categorys');
-  await Hive.deleteBoxFromDisk('medics');
+  //await Hive.deleteBoxFromDisk('medics');
   await Hive.openBox<MedicInfo>('medics');
+
   runApp(MyApp());
 }
 
@@ -37,10 +36,11 @@ class MyApp extends StatelessWidget {
       navigatorObservers: [BotToastNavigatorObserver()],
       title: 'Flutter App',
       theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'Almarai'),
-      home: BlocProvider(
-        create: (_) => UserCubit(DioConsumer(dio: Dio())),
-        child: king(),
-      ),
+      home: SplashScreen(),
+      // home: BlocProvider(
+      //   create: (_) => UserCubit(DioConsumer(dio: Dio())),
+      //   child: King(),
+      // ),
       debugShowCheckedModeBanner: false,
     );
   }

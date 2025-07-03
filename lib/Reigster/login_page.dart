@@ -240,7 +240,7 @@ class LoginScreen extends StatelessWidget {
           );
 
           Future.microtask(() {
-            CustomNavigator.pushReplacement(context, king());
+            CustomNavigator.pushReplacement(context, King());
           });
         } else if (state is UserFailure) {
           ScaffoldMessenger.of(

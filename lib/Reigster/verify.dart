@@ -79,7 +79,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
               context,
               BlocProvider.value(
                 value: context.read<UserCubit>(),
-                child: const king(),
+                child: const King(),
               ),
             );
           });

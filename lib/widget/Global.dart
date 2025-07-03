@@ -5,7 +5,7 @@ List<Map<String, dynamic>> viewUserDetails = [];
 List<Map<String, dynamic>> createUser = [];
 List<Map<String, dynamic>> showAllUsers = [];
 List<Map<String, dynamic>> globalRoles = [];
-const String baseUrl = "http://192.168.1.6:8000";
+const String baseUrl = "http://192.168.1.107:8000";
 
 class AlertHelper {
   static void showConfirmationDialog({
@@ -82,6 +82,123 @@ class CustomNavigator {
     return Navigator.of(context).pushAndRemoveUntil(
       CupertinoPageRoute(builder: (_) => page),
       predicate ?? (route) => false,
+    );
+  }
+}
+
+class AnimatedCupertinoLoader extends StatelessWidget {
+  final String message;
+  const AnimatedCupertinoLoader({this.message = "الرجاء الانتظار..."});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CupertinoActivityIndicator(radius: 16),
+          SizedBox(height: 12),
+          Text(message, style: TextStyle(fontSize: 16)),
+        ],
+      ),
+    );
+  }
+}
+
+class iOSRefreshWrapper extends StatelessWidget {
+  final Widget child;
+  final Future<void> Function() onRefresh;
+
+  const iOSRefreshWrapper({required this.child, required this.onRefresh});
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomScrollView(
+      physics: const BouncingScrollPhysics(),
+      slivers: [
+        CupertinoSliverRefreshControl(onRefresh: onRefresh),
+        SliverToBoxAdapter(child: child),
+      ],
+    );
+  }
+}
+
+class CupertinoSettingsGroup extends StatelessWidget {
+  final String? title;
+  final List<Widget> children;
+
+  const CupertinoSettingsGroup({this.title, required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoFormSection.insetGrouped(
+      header: title != null ? Text(title!) : null,
+      children: children,
+    );
+  }
+}
+
+class CupertinoInfoBanner extends StatelessWidget {
+  final String message;
+  final IconData icon;
+  final Color color;
+
+  const CupertinoInfoBanner({
+    required this.message,
+    this.icon = CupertinoIcons.info,
+    this.color = CupertinoColors.activeBlue,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: color),
+          SizedBox(width: 8),
+          Expanded(child: Text(message, style: TextStyle(color: color))),
+        ],
+      ),
+    );
+  }
+}
+
+class CustomCupertinoCard extends StatelessWidget {
+  final Widget child;
+  final EdgeInsetsGeometry padding;
+
+  const CustomCupertinoCard({
+    Key? key,
+    required this.child,
+    this.padding = const EdgeInsets.all(16),
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
+    return Container(
+      decoration: BoxDecoration(
+        color:
+            isDark
+                ? CupertinoColors.systemGrey.withOpacity(0.2)
+                : CupertinoColors.systemGrey6.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: isDark ? Colors.black12 : Colors.grey.withOpacity(0.1),
+            blurRadius: 10,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      padding: padding,
+      child: child,
     );
   }
 }
