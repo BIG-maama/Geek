@@ -1,7 +1,5 @@
 import 'package:bot_toast/bot_toast.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pro/BottomNavigator/Medicines/medic_&_catg_info.dart';
@@ -20,9 +18,8 @@ void main() async {
   Hive.registerAdapter(MedicInfoAdapter());
   await Hive.openBox<SupplierProfile>('suppliers');
   await Hive.openBox<CategoryInfo>('categorys');
-  //await Hive.deleteBoxFromDisk('medics');
+  await Hive.deleteBoxFromDisk('medics');
   await Hive.openBox<MedicInfo>('medics');
-
   runApp(MyApp());
 }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pro/BottomNavigator/Medicines/medic_&_catg_info.dart';
 import 'package:pro/BottomNavigator/Medicines/medicine_details.dart';
@@ -69,18 +70,35 @@ class _GroupedMedicinesCupertinoPageState
                                 color: CupertinoColors.systemCyan,
                               ),
                               onTap: () {
-                                CustomNavigator.push(
+                                // CustomNavigator.push(
+                                //   context,
+                                //   MedicineDetailsPage(medicine: med),
+                                // );
+                                Navigator.push(
                                   context,
-                                  MedicineDetailsPage(medicine: med),
+                                  MaterialPageRoute(
+                                    builder:
+                                        (_) =>
+                                            MedicineDetailsPage(medicine: med),
+                                  ),
                                 );
                               },
                               trailing: CupertinoButton(
                                 padding: EdgeInsets.zero,
                                 onPressed: () {
-                                  CustomNavigator.push(
+                                  // CustomNavigator.push(
+                                  //   context,
+                                  //   AlternativeMedicinesPage(
+                                  //     medicineId: med.id,
+                                  //   ),
+                                  // );
+                                  Navigator.push(
                                     context,
-                                    AlternativeMedicinesPage(
-                                      medicineId: med.id,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (_) => AlternativeMedicinesPage(
+                                            medicineId: med.id,
+                                          ),
                                     ),
                                   );
                                 },

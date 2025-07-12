@@ -251,3 +251,55 @@ class OrderDetailsScreen extends StatelessWidget {
     );
   }
 }
+
+
+
+
+
+// {
+//     "status": true,
+//     "status_code": 200,
+//     "message": "تم جلب تفاصيل الطلبية بنجاح",
+//     "data": {
+//         "id": 1,
+//         "order_number": "ORD-20250707-0001",
+//         "order_date": "2024-06-01T00:00:00.000000Z",
+//         "status": "pending",
+//         "supplier": {
+//             "id": 1,
+//             "name": "محمد علي",
+//             "phone": "9621234061",
+//             "email": "matrex663@gmail.com"
+//         },
+//         "items": [
+//             {
+//                 "id": 1,
+//                 "medicine": {
+//                     "id": 3,
+//                     "name": "hhslhhvsssssssswsw",
+//                     "code": "12121211"
+//                 },
+//                 "quantity": 13,
+//                 "unit_price": "44.00",
+//                 "total_price": "572.00",
+//                 "expiry_date": null
+//             },
+//             {
+//                 "id": 2,
+//                 "medicine": {
+//                     "id": 4,
+//                     "name": "hhslhhvsssssssswsws",
+//                     "code": "12121214"
+//                 },
+//                 "quantity": 13,
+//                 "unit_price": "44.00",
+//                 "total_price": "572.00",
+//                 "expiry_date": null
+//             }
+//         ],
+//         "total_amount": 1144,
+//         "items_count": 2,
+//         "created_at": "2025-07-07 18:47:45",
+//         "updated_at": "2025-07-07 18:47:45"
+//     }
+// }

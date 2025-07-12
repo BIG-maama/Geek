@@ -22,6 +22,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.11.0"
+  animated_button:
+    dependency: "direct main"
+    description:
+      name: animated_button
+      sha256: "238e093023955b3a21b14d230baeecb94fc796379e3dd8ee534c158838f24024"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.1"
   animated_snack_bar:
     dependency: "direct main"
     description:
@@ -30,6 +38,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.4.0"
+  animated_text_kit:
+    dependency: "direct main"
+    description:
+      name: animated_text_kit
+      sha256: adba517adb7e6adeb1eb5e1c8a147dd7bc664dfdf2f5e92226b572a91393a93d
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.2.3"
   ansicolor:
     dependency: transitive
     description:
@@ -222,6 +238,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.19.1"
+  confetti:
+    dependency: "direct main"
+    description:
+      name: confetti
+      sha256: "79376a99648efbc3f23582f5784ced0fe239922bd1a0fb41f582051eba750751"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.8.0"
   convert:
     dependency: transitive
     description:
@@ -286,6 +310,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
+  equatable:
+    dependency: transitive
+    description:
+      name: equatable
+      sha256: "567c64b3cb4cf82397aac55f4f0cbd3ca20d77c6c03bedbc4ceaddc08904aef7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.7"
   fake_async:
     dependency: transitive
     description:
@@ -334,11 +366,27 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
+  fl_chart:
+    dependency: "direct main"
+    description:
+      name: fl_chart
+      sha256: "577aeac8ca414c25333334d7c4bb246775234c0e44b38b10a82b559dd4d764e7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   flutter:
     dependency: "direct main"
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_animate:
+    dependency: "direct main"
+    description:
+      name: flutter_animate
+      sha256: "7befe2d3252728afb77aecaaea1dec88a89d35b9b1d2eea6d04479e8af9117b5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.5.2"
   flutter_bloc:
     dependency: "direct main"
     description:
@@ -387,6 +435,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.6.1"
+  flutter_shaders:
+    dependency: transitive
+    description:
+      name: flutter_shaders
+      sha256: "34794acadd8275d971e02df03afee3dee0f98dbfb8c4837082ad0034f612a3e2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.3"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -501,6 +557,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
+  intl:
+    dependency: "direct main"
+    description:
+      name: intl
+      sha256: "3df61194eb431efc39c4ceba583b95633a403f46c9fd341e550ce0bfa50e9aa5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.20.2"
   io:
     dependency: transitive
     description:
@@ -757,6 +821,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.2"
+  progress_state_button:
+    dependency: "direct main"
+    description:
+      name: progress_state_button
+      sha256: "8efbe7978995d3e20f3987022d4851d6615b25d227c17c3eb22f4dfc0c08811e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.4"
   provider:
     dependency: transitive
     description:
@@ -1039,6 +1111,14 @@ packages:
     description:
       name: timing
       sha256: "62ee18aca144e4a9f29d212f5a4c6a053be252b895ab14b5821996cff4ed90fe"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.2"
+  touchable:
+    dependency: "direct main"
+    description:
+      name: touchable
+      sha256: "50040b39778bb1adc8a480625de8681253bd2134785395cf16abd66bb13d3ed0"
       url: "https://pub.dev"
     source: hosted
     version: "1.0.2"

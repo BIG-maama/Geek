@@ -42,7 +42,11 @@ class _Medicines extends State<Medicines_Category_page> {
                     child: IOSButtons.iconButton(
                       text: "اضافة فئة ",
                       onPressed: () {
-                        CustomNavigator.push(context, AddCategoryPage());
+                        // CustomNavigator.push(context, AddCategoryPage());
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => AddCategoryPage()),
+                        );
                       },
                       icon: CupertinoIcons.cube_box,
                     ),
@@ -51,7 +55,13 @@ class _Medicines extends State<Medicines_Category_page> {
                   Expanded(
                     child: IOSButtons.iconButton(
                       onPressed: () {
-                        CustomNavigator.push(context, AddMedicineModern());
+                        //  CustomNavigator.push(context, AddMedicineModern());
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => AddMedicineModern(),
+                          ),
+                        );
                       },
                       text: 'اضافة دواء',
                       icon: CupertinoIcons.bandage,
@@ -122,10 +132,14 @@ class _Medicines extends State<Medicines_Category_page> {
                                 CupertinoButton(
                                   padding: EdgeInsets.zero,
                                   onPressed: () {
-                                    CustomNavigator.push(
+                                    Navigator.push(
                                       context,
-                                      GroupedMedicinesCupertinoPage(
-                                        category: item!,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (_) =>
+                                                GroupedMedicinesCupertinoPage(
+                                                  category: item!,
+                                                ),
                                       ),
                                     );
                                   },

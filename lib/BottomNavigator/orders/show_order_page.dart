@@ -266,10 +266,11 @@
 //     }
 //   }
 // }
+
 import 'package:flutter/material.dart';
+import 'package:pro/BottomNavigator/orders/add_new_order.dart';
 import 'package:pro/BottomNavigator/orders/order_details.dart';
 import 'dart:math';
-
 import 'package:pro/widget/Global.dart';
 
 class OrdersScreen extends StatefulWidget {
@@ -278,9 +279,12 @@ class OrdersScreen extends StatefulWidget {
 }
 
 class _OrdersScreenState extends State<OrdersScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   late AnimationController _controller;
+  late AnimationController _fabController;
+  late Animation<double> _fabAnimation;
+  final GlobalKey _fabKey = GlobalKey();
 
   final ValueNotifier<int> flashKey = ValueNotifier(0);
   List<Map<String, dynamic>> orders = [];
@@ -333,10 +337,29 @@ class _OrdersScreenState extends State<OrdersScreen>
   @override
   void initState() {
     super.initState();
+    _fabController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 600),
+    );
+
+    _fabAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _fabController, curve: Curves.elasticOut),
+    );
+
+    _fabController.forward();
+
+    // عرض التولتيب المخصص بعد تحميل الصفحة
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(Duration(milliseconds: 500), () {
+        _showCustomTooltip(context);
+      });
+    });
+
     _controller = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 500),
     );
+
     Future.delayed(Duration(milliseconds: 300), () {
       for (int i = 0; i < initialOrders.length; i++) {
         Future.delayed(Duration(milliseconds: 300 * i), () {
@@ -350,7 +373,45 @@ class _OrdersScreenState extends State<OrdersScreen>
   @override
   void dispose() {
     _controller.dispose();
+    _fabController.dispose();
     super.dispose();
+  }
+
+  void _showCustomTooltip(BuildContext context) {
+    final overlay = Overlay.of(context);
+    final renderBox = _fabKey.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox == null) return;
+
+    final targetPosition = renderBox.localToGlobal(Offset.zero);
+    final targetSize = renderBox.size;
+
+    final overlayEntry = OverlayEntry(
+      builder:
+          (context) => Positioned(
+            left:
+                targetPosition.dx +
+                targetSize.width / 2 -
+                40, // 40 = نصف عرض التولتيب تقريبيًا
+            top: targetPosition.dy - 40, // 40 = ارتفاع فوق الزر
+            child: Material(
+              color: Colors.transparent,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.black87,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text('طلب جديد', style: TextStyle(color: Colors.white)),
+              ),
+            ),
+          ),
+    );
+
+    overlay.insert(overlayEntry);
+
+    Future.delayed(Duration(seconds: 1), () {
+      overlayEntry.remove();
+    });
   }
 
   Widget _buildAnimatedItem(
@@ -380,12 +441,7 @@ class _OrdersScreenState extends State<OrdersScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xffeef2f7),
-      appBar: AppBar(
-        title: Text('الطلبات'),
-        backgroundColor: Colors.blueAccent,
-        elevation: 0,
-      ),
+      backgroundColor: const Color(0xffeef2f7),
       body: AnimatedList(
         key: _listKey,
         padding: const EdgeInsets.all(20),
@@ -393,6 +449,27 @@ class _OrdersScreenState extends State<OrdersScreen>
         itemBuilder:
             (context, index, animation) =>
                 _buildAnimatedItem(context, index, animation),
+      ),
+      floatingActionButton: Builder(
+        builder:
+            (context) => ScaleTransition(
+              scale: _fabAnimation,
+              child: FloatingActionButton(
+                key: _fabKey,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => NewOrderStepper()),
+                  );
+                },
+                backgroundColor: Colors.blueAccent,
+                child: const Icon(Icons.add, size: 28),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 6,
+              ),
+            ),
       ),
     );
   }
@@ -535,3 +612,77 @@ class _OrdersScreenState extends State<OrdersScreen>
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+// {
+//     "status": true,
+//     "status_code": 200,
+//     "message": "تم جلب الطلبات بنجاح",
+//     "data": {
+//         "orders": {
+//             "current_page": 1,
+//             "data": [
+//                 {
+//                     "id": 1,
+//                     "order_number": "ORD-20250707-0001",
+//                     "order_date": "2024-06-01T00:00:00.000000Z",
+//                     "status": "pending",
+//                     "supplier": {
+//                         "id": 1,
+//                         "name": "محمد علي"
+//                     },
+//                     "total_amount": 1144,
+//                     "items_count": 2,
+//                     "created_at": "2025-07-07 18:47:45"
+//                 }
+//             ],
+//             "first_page_url": "http://localhost:8000/api/orders?page=1",
+//             "from": 1,
+//             "last_page": 1,
+//             "last_page_url": "http://localhost:8000/api/orders?page=1",
+//             "links": [
+//                 {
+//                     "url": null,
+//                     "label": "&laquo; السابق",
+//                     "active": false
+//                 },
+//                 {
+//                     "url": "http://localhost:8000/api/orders?page=1",
+//                     "label": "1",
+//                     "active": true
+//                 },
+//                 {
+//                     "url": null,
+//                     "label": "التالي &raquo;",
+//                     "active": false
+//                 }
+//             ],
+//             "next_page_url": null,
+//             "path": "http://localhost:8000/api/orders",
+//             "per_page": 10,
+//             "prev_page_url": null,
+//             "to": 1,
+//             "total": 1
+//         },
+//         "filters": {
+//             "statuses": [
+//                 "pending",
+//                 "confirmed",
+//                 "completed",
+//                 "cancelled"
+//             ],
+//             "date_from": null,
+//             "date_to": null,
+//             "supplier_id": null,
+//             "search": null
+//         }
+//     }
+// }

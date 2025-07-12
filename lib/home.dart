@@ -14,185 +14,9 @@ import 'package:pro/Roles/users.dart';
 import 'package:pro/cubit/user_cubit.dart';
 import 'package:pro/cubit/user_state.dart';
 import 'package:pro/widget/Global.dart';
+import 'package:pro/widget/drop_down.dart';
 import 'package:pro/widget/qr_code.dart';
 
-// class King extends StatefulWidget {
-//   const King({Key? key}) : super(key: key);
-
-//   @override
-//   State<King> createState() => _King();
-// }
-
-// class _King extends State<King> {
-//   int currentIndex = 0;
-
-//   final List<Widget> pages = [
-//     const Dashboard(),
-//     const Medicines_Category_page(),
-//     const SuppliersPage(),
-//     OrdersPage(),
-//   ];
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return BlocConsumer<UserCubit, UserState>(
-//       listener: (context, state) {
-//         if (state is UserFailure) {
-//           ScaffoldMessenger.of(
-//             context,
-//           ).showSnackBar(SnackBar(content: Text(state.message)));
-//         }
-//         if (state is UserSuccess) {
-//           CustomNavigator.push(
-//             context,
-//             BlocProvider.value(
-//               value: context.read<UserCubit>(),
-//               child: LoginScreen(),
-//             ),
-//           );
-//         }
-//       },
-//       builder: (context, state) {
-//         final cubit = context.read<UserCubit>();
-//         return Scaffold(
-//           appBar: AppBar(title: const Text("hello")),
-//           drawer: Drawer(
-//             child: SingleChildScrollView(
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.stretch,
-//                 children: [
-//                   DrawerHeader(
-//                     decoration: BoxDecoration(color: Colors.green.shade100),
-//                     child: const SizedBox(), // placeholder
-//                   ),
-//                   Container(
-//                     padding: const EdgeInsets.all(29),
-//                     child: Wrap(
-//                       runSpacing: 15,
-//                       children: [
-//                         CupertinoExpansionTileAnimated(
-//                           leading: const Icon(CupertinoIcons.settings),
-//                           title: const Text("إعدادات المستخدم"),
-//                           children: [
-//                             CupertinoButton(
-//                               padding: const EdgeInsets.symmetric(
-//                                 horizontal: 16,
-//                               ),
-//                               color: CupertinoColors.systemGrey5,
-//                               child: const Text("المستخدمين"),
-//                               onPressed: () {
-//                                 CustomNavigator.push(
-//                                   context,
-//                                   UserManagementPage(),
-//                                 );
-//                               },
-//                             ),
-//                             CupertinoButton(
-//                               padding: const EdgeInsets.symmetric(
-//                                 horizontal: 16,
-//                               ),
-//                               color: CupertinoColors.systemGrey5,
-//                               child: const Text("الصلاحيات"),
-//                               onPressed: () {
-//                                 CustomNavigator.push(
-//                                   context,
-//                                   const User_Permission(),
-//                                 );
-//                               },
-//                             ),
-//                           ],
-//                         ),
-//                         const Divider(),
-//                         CupertinoExpansionTileAnimated(
-//                           leading: const Icon(CupertinoIcons.settings),
-//                           title: const Text("اعدادات الدواء "),
-//                           children: [
-//                             CupertinoButton(
-//                               padding: const EdgeInsets.symmetric(
-//                                 horizontal: 16,
-//                               ),
-//                               color: CupertinoColors.systemGrey5,
-//                               child: const Text("شكل الدواء"),
-//                               onPressed: () {
-//                                 CustomNavigator.push(
-//                                   context,
-//                                   MedicineFormsPage(),
-//                                 );
-//                               },
-//                             ),
-//                             CupertinoButton(
-//                               padding: const EdgeInsets.symmetric(
-//                                 horizontal: 16,
-//                               ),
-//                               color: CupertinoColors.systemGrey5,
-//                               child: const Text("الشركة المصنعة للدواء"),
-//                               onPressed: () {
-//                                 CustomNavigator.push(context, BrandsPage());
-//                               },
-//                             ),
-//                           ],
-//                         ),
-//                         const Divider(),
-//                         SizedBox(
-//                           width: double.infinity,
-//                           child: IOSButtons.iconButton(
-//                             icon: CupertinoIcons.cloud_fog,
-//                             text: 'أدوية تالفة',
-//                             onPressed: () {
-//                               CustomNavigator.push(
-//                                 context,
-//                                 DamagedMedicinesPage(),
-//                               );
-//                             },
-//                           ),
-//                         ),
-//                         const Divider(),
-//                         ListTile(
-//                           leading: const Icon(Icons.logout_outlined),
-//                           title: const Text("log out"),
-//                           onTap:
-//                               state is UserLoading
-//                                   ? null
-//                                   : () => cubit.signOut(),
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ),
-//           body: pages[currentIndex],
-//           bottomNavigationBar: BottomNavigationBar(
-//             currentIndex: currentIndex,
-//             onTap: (index) => setState(() => currentIndex = index),
-//             selectedItemColor: Colors.green, // لون العنصر المختار
-//             unselectedItemColor: Colors.grey, // لون العناصر غير المختارة
-//             backgroundColor: Colors.white, // خلفية الشريط
-//             items: const [
-//               BottomNavigationBarItem(
-//                 icon: Icon(Icons.dashboard_rounded),
-//                 label: "Dashboard",
-//               ),
-//               BottomNavigationBarItem(
-//                 icon: Icon(Icons.medical_services_outlined),
-//                 label: "Medicines",
-//               ),
-//               BottomNavigationBarItem(
-//                 icon: Icon(Icons.support_agent_rounded),
-//                 label: "Suppliers",
-//               ),
-//               BottomNavigationBarItem(
-//                 icon: Icon(Icons.add_circle_rounded),
-//                 label: "Order",
-//               ),
-//             ],
-//           ),
-//         );
-//       },
-//     );
-//   }
-// }
 class King extends StatefulWidget {
   const King({Key? key}) : super(key: key);
   @override
@@ -258,48 +82,288 @@ class _KingState extends State<King> {
             page = OrdersScreen();
             break;
         }
-
+        final GlobalKey<ScaffoldState> localScaffoldKey =
+            GlobalKey<ScaffoldState>();
         return CupertinoTabView(
           builder: (context) {
             return BlocProvider.value(
               value: BlocProvider.of<UserCubit>(context),
-              child: CupertinoPageScaffold(
-                navigationBar: CupertinoNavigationBar(
-                  middle: Text(_tabTitle(index)),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (index == 1 || index == 0 || index == 2)
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(
-                              CupertinoPageRoute(
-                                builder:
-                                    (_) => QRScannerPage(
-                                      onCodeScanned: (code) {
-                                        _showMedicineInfoDialog(context, code);
-                                      },
-                                    ),
-                              ),
-                            );
-                          },
-
-                          child: const Icon(CupertinoIcons.camera),
-                        ),
-                      const SizedBox(width: 12),
-                      GestureDetector(
-                        onTap: () => _openDrawer(context),
-                        child: const Icon(CupertinoIcons.settings),
-                      ),
-                    ],
+              child: Scaffold(
+                key: localScaffoldKey,
+                drawer: _buildDrawer(),
+                body: CupertinoPageScaffold(
+                  navigationBar: CupertinoNavigationBar(
+                    middle: Text(_tabTitle(index)),
+                    leading: GestureDetector(
+                      onTap: () => localScaffoldKey.currentState?.openDrawer(),
+                      child: const Icon(CupertinoIcons.settings),
+                    ),
+                    trailing: GestureDetector(
+                      onTap: () => _showActionSheet(context),
+                      child: const Icon(CupertinoIcons.ellipsis_vertical),
+                    ),
                   ),
+                  child: SafeArea(child: page),
                 ),
-                child: SafeArea(child: page),
               ),
             );
           },
         );
       },
+    );
+  }
+
+  Widget _buildDrawer() {
+    return Drawer(
+      child: Container(
+        color: Colors.white,
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+        child: ListView(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 24,
+              ),
+              color: Colors.green.shade50,
+              child: const Text(
+                'الإعدادات',
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
+              ),
+            ),
+            SizedBox(height: 12),
+
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.green.shade50.withOpacity(0.4),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.green.shade100.withOpacity(0.5),
+                    blurRadius: 6,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  _buildIOSDrawerItem(
+                    icon: CupertinoIcons.person_2_fill,
+                    text: 'المستخدمين',
+                    iconColor: Colors.green.shade700,
+                    textColor: Colors.green.shade900,
+                    onTap: () {
+                      Navigator.of(context).push(
+                        CupertinoPageRoute(
+                          builder: (_) => UserManagementPage(),
+                        ),
+                      );
+                    },
+                  ),
+                  _buildIOSDrawerItem(
+                    icon: CupertinoIcons.lock_shield_fill,
+                    text: 'الصلاحيات',
+                    iconColor: Colors.green.shade700,
+                    textColor: Colors.green.shade900,
+                    onTap: () {
+                      Navigator.of(context).push(
+                        CupertinoPageRoute(builder: (_) => User_Permission()),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 12),
+            // بلوك شكل الدواء والشركة المصنعة
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.green.shade50.withOpacity(0.4),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.green.shade100.withOpacity(0.5),
+                    blurRadius: 6,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  _buildIOSDrawerItem(
+                    icon: CupertinoIcons.cube_box_fill,
+                    text: 'شكل الدواء',
+                    iconColor: Colors.green.shade700,
+                    textColor: Colors.green.shade900,
+                    onTap: () {
+                      Navigator.of(context).push(
+                        CupertinoPageRoute(builder: (_) => MedicineFormsPage()),
+                      );
+                    },
+                  ),
+                  _buildIOSDrawerItem(
+                    icon: CupertinoIcons.building_2_fill,
+                    text: 'الشركة المصنعة',
+                    iconColor: Colors.green.shade700,
+                    textColor: Colors.green.shade900,
+                    onTap: () {
+                      Navigator.of(
+                        context,
+                      ).push(CupertinoPageRoute(builder: (_) => BrandsPage()));
+                    },
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 12),
+            // بلوك أدوية تالفة
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.green.shade50.withOpacity(0.4),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.green.shade100.withOpacity(0.5),
+                    blurRadius: 6,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: _buildIOSDrawerItem(
+                icon: CupertinoIcons.bandage_fill,
+                text: 'أدوية تالفة',
+                iconColor: Colors.green.shade700,
+                textColor: Colors.green.shade900,
+                onTap: () {
+                  Navigator.of(context).push(
+                    CupertinoPageRoute(builder: (_) => DamagedMedicinesPage()),
+                  );
+                },
+              ),
+            ),
+            SizedBox(height: 20),
+            _buildExpandableTile(
+              icon: CupertinoIcons.paperclip,
+              title: 'إدارة الفواتير',
+              children: [
+                ListTile(
+                  leading: Icon(
+                    CupertinoIcons.person_2_fill,
+                    color: Colors.green,
+                  ),
+                  title: Text('المستخدمين'),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      CupertinoPageRoute(builder: (_) => UserManagementPage()),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: Icon(
+                    CupertinoIcons.lock_shield_fill,
+                    color: Colors.green,
+                  ),
+                  title: Text('الصلاحيات'),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      CupertinoPageRoute(builder: (_) => User_Permission()),
+                    );
+                  },
+                ),
+                // Divider(),
+                // CustomIOSDropdown(),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExpandableTile({
+    required IconData icon,
+    required String title,
+    required List<Widget> children,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.green.shade50.withOpacity(0.4),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.green.shade100.withOpacity(0.3),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Theme(
+        data: ThemeData().copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          leading: Icon(icon, color: Colors.green.shade700),
+          title: Text(
+            title,
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w600,
+              color: Colors.green.shade900,
+            ),
+          ),
+          iconColor: Colors.green,
+          collapsedIconColor: Colors.green.shade700,
+          childrenPadding: const EdgeInsets.symmetric(horizontal: 16),
+          expandedCrossAxisAlignment: CrossAxisAlignment.start,
+          children: children,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildIOSDrawerItem({
+    required IconData icon,
+    required String text,
+    required VoidCallback onTap,
+    Color iconColor = CupertinoColors.systemGrey,
+    Color textColor = Colors.black87,
+  }) {
+    return Column(
+      children: [
+        ListTile(
+          leading: Icon(icon, color: iconColor, size: 24),
+          title: Text(
+            text,
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w500,
+              color: textColor,
+            ),
+          ),
+          onTap: onTap,
+          horizontalTitleGap: 12,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+          trailing: const Icon(
+            CupertinoIcons.forward,
+            size: 18,
+            color: CupertinoColors.systemGrey2,
+          ),
+          hoverColor: Colors.green.shade50, // تأثير عند اللمس أخضر فاتح جداً
+        ),
+        Divider(
+          height: 1,
+          thickness: 0.4,
+          indent: 60,
+          endIndent: 16,
+          color: Colors.green.shade100,
+        ),
+      ],
     );
   }
 
@@ -318,66 +382,47 @@ class _KingState extends State<King> {
     }
   }
 
-  void _openDrawer(BuildContext context) {
+  void _showActionSheet(BuildContext context) {
     showCupertinoModalPopup(
       useRootNavigator: true,
       context: context,
       builder:
-          (context) => CupertinoActionSheet(
-            title: const Text("الإعدادات"),
-            actions: [
-              CupertinoActionSheetAction(
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.of(context, rootNavigator: true).push(
-                    CupertinoPageRoute(builder: (_) => UserManagementPage()),
-                  );
-                },
-                child: const Text("المستخدمين"),
+          (context) => Container(
+            child: CupertinoActionSheet(
+              title: const Text(
+                "الخيارات",
+                style: TextStyle(color: Colors.black),
               ),
-              CupertinoActionSheetAction(
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.of(
-                    context,
-                    rootNavigator: true,
-                  ).push(CupertinoPageRoute(builder: (_) => User_Permission()));
-                },
-                child: const Text("الصلاحيات"),
+              message: const Text(
+                "اختر أحد الخيارات التالية",
+                style: TextStyle(color: Colors.black),
               ),
-              CupertinoActionSheetAction(
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.of(context, rootNavigator: true).push(
-                    CupertinoPageRoute(builder: (_) => MedicineFormsPage()),
-                  );
-                },
-                child: const Text("شكل الدواء"),
+              actions: [
+                CupertinoActionSheetAction(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.of(context).push(
+                      CupertinoPageRoute(
+                        builder:
+                            (_) => QRScannerPage(
+                              onCodeScanned: (code) {
+                                _showMedicineInfoDialog(context, code);
+                              },
+                            ),
+                      ),
+                    );
+                  },
+                  child: const Text(
+                    "Scan Medicine",
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+              ],
+              cancelButton: CupertinoActionSheetAction(
+                onPressed: () => Navigator.of(context).pop(),
+                isDestructiveAction: true,
+                child: const Text("إغلاق"),
               ),
-              CupertinoActionSheetAction(
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.of(
-                    context,
-                    rootNavigator: true,
-                  ).push(CupertinoPageRoute(builder: (_) => BrandsPage()));
-                },
-                child: const Text("الشركة المصنعة"),
-              ),
-              CupertinoActionSheetAction(
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.of(context, rootNavigator: true).push(
-                    CupertinoPageRoute(builder: (_) => DamagedMedicinesPage()),
-                  );
-                },
-                child: const Text("أدوية تالفة"),
-              ),
-            ],
-            cancelButton: CupertinoActionSheetAction(
-              onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
-              isDestructiveAction: true,
-              child: const Text("إغلاق"),
             ),
           ),
     );
