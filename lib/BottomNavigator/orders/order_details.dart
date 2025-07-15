@@ -1,59 +1,105 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'package:pro/widget/Global.dart';
 
-class OrderDetailsScreen extends StatelessWidget {
-  final Map<String, dynamic> orderData;
+class OrderDetailsScreen extends StatefulWidget {
+  final int orderId;
 
-  const OrderDetailsScreen({Key? key, required this.orderData})
-    : super(key: key);
+  const OrderDetailsScreen({Key? key, required this.orderId}) : super(key: key);
+
+  @override
+  _OrderDetailsScreenState createState() => _OrderDetailsScreenState();
+}
+
+class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
+  Map<String, dynamic>? orderData;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchOrderDetails();
+  }
+
+  Future<void> fetchOrderDetails() async {
+    try {
+      final response = await Dio().get("$baseUrl/api/orders/${widget.orderId}");
+      if (response.statusCode == 200 && response.data['status'] == true) {
+        setState(() {
+          orderData = response.data['data'];
+          isLoading = false;
+        });
+      } else {
+        // handle API error
+        showError("فشل في تحميل البيانات.");
+      }
+    } catch (e) {
+      showError("حدث خطأ أثناء الاتصال بالخادم.");
+    }
+  }
+
+  void showError(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+    Navigator.of(context).pop(); // Exit the screen if there's an error
+  }
 
   @override
   Widget build(BuildContext context) {
-    final data = orderData;
-    final supplier = data['supplier'] ?? {};
-    final items = List<Map<String, dynamic>>.from(data['items'] ?? []);
-
     return Scaffold(
-      backgroundColor: Color(0xFFF0FDF4), // أخضر فاتح خلفية ناعمة
+      backgroundColor: Color(0xFFF0FDF4),
       appBar: AppBar(
         title: Text('تفاصيل الطلبية'),
         backgroundColor: Colors.greenAccent[700],
         elevation: 2,
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildSectionTitle('📝 معلومات الطلب'),
-            _infoCard([
-              _infoRow('رقم الطلب', data['order_number']),
-              _infoRow(
-                'تاريخ الطلب',
-                data['order_date'].toString().split('T').first,
-              ),
-              _statusBadge(data['status']),
-            ]),
+      body:
+          isLoading
+              ? Center(child: CircularProgressIndicator())
+              : _buildOrderDetails(),
+    );
+  }
 
-            SizedBox(height: 20),
-            _buildSectionTitle('🏢 بيانات المورّد'),
-            _infoCard([
-              _infoRow('اسم المورّد', supplier['name'] ?? '-'),
-              _infoRow('الهاتف', supplier['phone'] ?? '-'),
-              _infoRow('البريد الإلكتروني', supplier['email'] ?? '-'),
-            ]),
+  Widget _buildOrderDetails() {
+    final data = orderData!;
+    final supplier = data['supplier'] ?? {};
+    final items = List<Map<String, dynamic>>.from(data['items'] ?? []);
 
-            SizedBox(height: 20),
-            _buildSectionTitle('📦 الأصناف'),
-            ...items.map((item) => _itemCard(item)),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionTitle('📝 معلومات الطلب'),
+          _infoCard([
+            _infoRow('رقم الطلب', data['order_number']),
+            _infoRow(
+              'تاريخ الطلب',
+              data['order_date'].toString().split('T').first,
+            ),
+            _statusBadge(data['status']),
+          ]),
 
-            SizedBox(height: 20),
-            _buildSectionTitle('💰 الإجمالي'),
-            _totalAmount('${data['total_amount']} ج.م'),
+          SizedBox(height: 20),
+          _buildSectionTitle('🏢 بيانات المورّد'),
+          _infoCard([
+            _infoRow('اسم المورّد', supplier['name'] ?? '-'),
+            _infoRow('الهاتف', supplier['phone'] ?? '-'),
+            _infoRow('البريد الإلكتروني', supplier['email'] ?? '-'),
+          ]),
 
-            SizedBox(height: 40),
-          ],
-        ),
+          SizedBox(height: 20),
+          _buildSectionTitle('📦 الأصناف'),
+          ...items.map((item) => _itemCard(item)),
+
+          SizedBox(height: 20),
+          _buildSectionTitle('💰 الإجمالي'),
+          _totalAmount('${data['total_amount']} ج.م'),
+
+          SizedBox(height: 40),
+        ],
       ),
     );
   }

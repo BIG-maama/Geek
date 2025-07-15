@@ -267,6 +267,8 @@
 //   }
 // }
 
+import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pro/BottomNavigator/orders/add_new_order.dart';
 import 'package:pro/BottomNavigator/orders/order_details.dart';
@@ -280,6 +282,8 @@ class OrdersScreen extends StatefulWidget {
 
 class _OrdersScreenState extends State<OrdersScreen>
     with TickerProviderStateMixin {
+  bool _isLoading = true;
+
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   late AnimationController _controller;
   late AnimationController _fabController;
@@ -289,50 +293,45 @@ class _OrdersScreenState extends State<OrdersScreen>
   final ValueNotifier<int> flashKey = ValueNotifier(0);
   List<Map<String, dynamic>> orders = [];
 
-  final List<Map<String, dynamic>> initialOrders = [
-    {
-      "id": 1,
-      "order_number": "ORD-20250630-0001",
-      "order_date": "2024-06-01T00:00:00.000000Z",
-      "status": "pending",
-      "total_amount": 968,
-      "items": [
-        {
-          "medicine_name": "hhslhhvsss",
-          "quantity": 10,
-          "unit_price": "44.00",
-          "total_price": 440,
-        },
-        {
-          "medicine_name": "hhslhhvssss",
-          "quantity": 12,
-          "unit_price": "44.00",
-          "total_price": 528,
-        },
-      ],
-    },
-    {
-      "id": 2,
-      "order_number": "ORD-20250630-0002",
-      "order_date": "2024-06-01T00:00:00.000000Z",
-      "status": "pending",
-      "total_amount": 1144,
-      "items": [
-        {
-          "medicine_name": "hhslhhvsssss",
-          "quantity": 13,
-          "unit_price": "44.00",
-          "total_price": 572,
-        },
-        {
-          "medicine_name": "hhslhhvsssssسسسسس",
-          "quantity": 13,
-          "unit_price": "44.00",
-          "total_price": 572,
-        },
-      ],
-    },
-  ];
+  Future<void> fetchOrders() async {
+    try {
+      print("بدأ تحميل الطلبات...");
+      final response = await Dio().get('$baseUrl/api/orders');
+      print(response.data);
+
+      if (response.statusCode == 200 && response.data['status'] == true) {
+        final List<dynamic> fetchedOrders =
+            response.data['data']['orders']['data'];
+
+        for (int i = 0; i < fetchedOrders.length; i++) {
+          final order = fetchedOrders[i];
+          final orderMap = {
+            "id": order["id"],
+            "order_number": order["order_number"],
+            "order_date": order["order_date"],
+            "status": order["status"],
+            "total_amount": order["total_amount"],
+            "supplier": order["supplier"],
+            "items": [], // ملء لاحقًا إذا توفر
+          };
+
+          // بدون تأخير هنا
+          orders.add(orderMap);
+          _listKey.currentState?.insertItem(orders.length - 1);
+        }
+      }
+    } catch (e, s) {
+      print("خطأ أثناء جلب الطلبات: $e");
+      print("StackTrace: $s");
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('حدث خطأ أثناء تحميل الطلبات')));
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -348,7 +347,6 @@ class _OrdersScreenState extends State<OrdersScreen>
 
     _fabController.forward();
 
-    // عرض التولتيب المخصص بعد تحميل الصفحة
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(Duration(milliseconds: 500), () {
         _showCustomTooltip(context);
@@ -360,14 +358,7 @@ class _OrdersScreenState extends State<OrdersScreen>
       duration: Duration(milliseconds: 500),
     );
 
-    Future.delayed(Duration(milliseconds: 300), () {
-      for (int i = 0; i < initialOrders.length; i++) {
-        Future.delayed(Duration(milliseconds: 300 * i), () {
-          orders.add(initialOrders[i]);
-          _listKey.currentState?.insertItem(i);
-        });
-      }
-    });
+    fetchOrders();
   }
 
   @override
@@ -388,11 +379,8 @@ class _OrdersScreenState extends State<OrdersScreen>
     final overlayEntry = OverlayEntry(
       builder:
           (context) => Positioned(
-            left:
-                targetPosition.dx +
-                targetSize.width / 2 -
-                40, // 40 = نصف عرض التولتيب تقريبيًا
-            top: targetPosition.dy - 40, // 40 = ارتفاع فوق الزر
+            left: targetPosition.dx + targetSize.width / 2 - 40,
+            top: targetPosition.dy - 40,
             child: Material(
               color: Colors.transparent,
               child: Container(
@@ -442,26 +430,37 @@ class _OrdersScreenState extends State<OrdersScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffeef2f7),
-      body: AnimatedList(
-        key: _listKey,
-        padding: const EdgeInsets.all(20),
-        initialItemCount: orders.length,
-        itemBuilder:
-            (context, index, animation) =>
-                _buildAnimatedItem(context, index, animation),
-      ),
+      body:
+          _isLoading
+              ? Center(child: CircularProgressIndicator())
+              : AnimatedList(
+                key: _listKey,
+                padding: const EdgeInsets.all(20),
+                initialItemCount: orders.length,
+                itemBuilder:
+                    (context, index, animation) =>
+                        _buildAnimatedItem(context, index, animation),
+              ),
       floatingActionButton: Builder(
         builder:
             (context) => ScaleTransition(
               scale: _fabAnimation,
               child: FloatingActionButton(
                 key: _fabKey,
-                onPressed: () {
-                  Navigator.push(
+                onPressed: () async {
+                  final result = await CustomNavigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => NewOrderStepper()),
+                    AddNewOrder(),
                   );
+                  if (result == true) {
+                    setState(() {
+                      _isLoading = true;
+                      orders.clear();
+                    });
+                    await fetchOrders();
+                  }
                 },
+
                 backgroundColor: Colors.blueAccent,
                 child: const Icon(Icons.add, size: 28),
                 shape: RoundedRectangleBorder(
@@ -527,51 +526,120 @@ class _OrdersScreenState extends State<OrdersScreen>
                 color: Colors.green,
               ),
               SizedBox(height: 18),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: GestureDetector(
-                  onTap: () async {
-                    flashKey.value = order['id'];
-                    await Future.delayed(Duration(milliseconds: 200));
-                    flashKey.value = -1;
-                    CustomNavigator.push(
-                      context,
-                      OrderDetailsScreen(orderData: order),
-                    );
-                  },
-                  child: TweenAnimationBuilder<double>(
-                    tween: Tween(begin: 1.0, end: 1.05),
-                    duration: Duration(milliseconds: 800),
-                    curve: Curves.easeInOut,
-                    builder: (context, scale, child) {
-                      return Transform.scale(scale: scale, child: child);
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton.icon(
+                    icon: Icon(Icons.delete, color: Colors.white),
+                    label: Text(
+                      'حذف الطلب',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () {
+                      _deleteOrder(order['id']);
                     },
-                    child: ElevatedButton.icon(
-                      onPressed: null,
-                      icon: Icon(Icons.visibility, color: Colors.black),
-                      label: Text(
-                        'عرض التفاصيل',
-                        style: TextStyle(color: Colors.black),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.redAccent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
                       ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.greenAccent.withOpacity(0.9),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 14,
-                        ),
-                        elevation: 2,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
                       ),
                     ),
                   ),
-                ),
+                  ElevatedButton.icon(
+                    icon: Icon(Icons.visibility, color: Colors.black),
+                    label: Text(
+                      'عرض التفاصيل',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                    onPressed: () async {
+                      flashKey.value = order['id'];
+                      await Future.delayed(Duration(milliseconds: 200));
+                      flashKey.value = -1;
+                      CustomNavigator.push(
+                        context,
+                        OrderDetailsScreen(orderId: order['id']),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.greenAccent.withOpacity(0.9),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
         );
       },
+    );
+  }
+
+  void _deleteOrder(int orderId) {
+    showCupertinoDialog(
+      context: context,
+      builder:
+          (context) => CupertinoAlertDialog(
+            title: Text("تأكيد الحذف"),
+            content: Text("هل أنت متأكد أنك تريد حذف هذا الطلب؟"),
+            actions: [
+              CupertinoDialogAction(
+                child: Text("إلغاء"),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              CupertinoDialogAction(
+                isDestructiveAction: true,
+                child: Text("حذف"),
+                onPressed: () async {
+                  Navigator.of(context).pop();
+
+                  try {
+                    final response = await Dio().delete(
+                      '$baseUrl/api/orders/$orderId',
+                    );
+
+                    if (response.statusCode == 200 &&
+                        response.data['status'] == true) {
+                      final index = orders.indexWhere(
+                        (o) => o['id'] == orderId,
+                      );
+                      if (index != -1) {
+                        orders.removeAt(index);
+                        _listKey.currentState?.removeItem(
+                          index,
+                          (context, animation) =>
+                              _buildAnimatedItem(context, index, animation),
+                          duration: Duration(milliseconds: 500),
+                        );
+                        setState(() {});
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('تم حذف الطلب بنجاح')),
+                        );
+                      }
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('فشل في حذف الطلب')),
+                      );
+                    }
+                  } catch (e) {
+                    print("خطأ أثناء حذف الطلب: $e");
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('حدث خطأ أثناء حذف الطلب')),
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
     );
   }
 
@@ -612,77 +680,3 @@ class _OrdersScreenState extends State<OrdersScreen>
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-// {
-//     "status": true,
-//     "status_code": 200,
-//     "message": "تم جلب الطلبات بنجاح",
-//     "data": {
-//         "orders": {
-//             "current_page": 1,
-//             "data": [
-//                 {
-//                     "id": 1,
-//                     "order_number": "ORD-20250707-0001",
-//                     "order_date": "2024-06-01T00:00:00.000000Z",
-//                     "status": "pending",
-//                     "supplier": {
-//                         "id": 1,
-//                         "name": "محمد علي"
-//                     },
-//                     "total_amount": 1144,
-//                     "items_count": 2,
-//                     "created_at": "2025-07-07 18:47:45"
-//                 }
-//             ],
-//             "first_page_url": "http://localhost:8000/api/orders?page=1",
-//             "from": 1,
-//             "last_page": 1,
-//             "last_page_url": "http://localhost:8000/api/orders?page=1",
-//             "links": [
-//                 {
-//                     "url": null,
-//                     "label": "&laquo; السابق",
-//                     "active": false
-//                 },
-//                 {
-//                     "url": "http://localhost:8000/api/orders?page=1",
-//                     "label": "1",
-//                     "active": true
-//                 },
-//                 {
-//                     "url": null,
-//                     "label": "التالي &raquo;",
-//                     "active": false
-//                 }
-//             ],
-//             "next_page_url": null,
-//             "path": "http://localhost:8000/api/orders",
-//             "per_page": 10,
-//             "prev_page_url": null,
-//             "to": 1,
-//             "total": 1
-//         },
-//         "filters": {
-//             "statuses": [
-//                 "pending",
-//                 "confirmed",
-//                 "completed",
-//                 "cancelled"
-//             ],
-//             "date_from": null,
-//             "date_to": null,
-//             "supplier_id": null,
-//             "search": null
-//         }
-//     }
-// }

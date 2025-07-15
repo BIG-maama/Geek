@@ -18,7 +18,7 @@ void main() async {
   Hive.registerAdapter(MedicInfoAdapter());
   await Hive.openBox<SupplierProfile>('suppliers');
   await Hive.openBox<CategoryInfo>('categorys');
-  await Hive.deleteBoxFromDisk('medics');
+  //await Hive.deleteBoxFromDisk('medics');
   await Hive.openBox<MedicInfo>('medics');
   runApp(MyApp());
 }

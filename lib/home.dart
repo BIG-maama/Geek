@@ -7,14 +7,11 @@ import 'package:pro/BottomNavigator/Medicines/brands-shape_medic/Brand_med.dart'
 import 'package:pro/BottomNavigator/Medicines/brands-shape_medic/Shape_med.dart';
 import 'package:pro/BottomNavigator/Medicines/talif_medicine.dart';
 import 'package:pro/BottomNavigator/Suppliers/Suppliers.dart';
+import 'package:pro/BottomNavigator/orders/show_order_filter.dart';
 import 'package:pro/BottomNavigator/orders/show_order_page.dart';
 import 'package:pro/Permission/user_permission.dart';
-import 'package:pro/Reigster/login_page.dart';
 import 'package:pro/Roles/users.dart';
 import 'package:pro/cubit/user_cubit.dart';
-import 'package:pro/cubit/user_state.dart';
-import 'package:pro/widget/Global.dart';
-import 'package:pro/widget/drop_down.dart';
 import 'package:pro/widget/qr_code.dart';
 
 class King extends StatefulWidget {
@@ -279,6 +276,76 @@ class _KingState extends State<King> {
                 ),
                 // Divider(),
                 // CustomIOSDropdown(),
+              ],
+            ),
+            _buildExpandableTile(
+              icon: CupertinoIcons.square_list,
+              title: 'طلبات',
+              children: [
+                ListTile(
+                  leading: const Icon(
+                    CupertinoIcons.person_crop_circle_badge_checkmark,
+                    color: Colors.green,
+                  ),
+                  title: const Text('حسب المورد'),
+                  onTap:
+                      () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (_) => const OrdersResultPage(
+                                filterType: 'supplier',
+                              ),
+                        ),
+                      ),
+                ),
+                ListTile(
+                  leading: const Icon(
+                    CupertinoIcons.square_favorites_alt,
+                    color: Colors.green,
+                  ),
+                  title: const Text('حسب الحالة'),
+                  onTap:
+                      () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (_) =>
+                                  const OrdersResultPage(filterType: 'status'),
+                        ),
+                      ),
+                ),
+                ListTile(
+                  leading: const Icon(
+                    CupertinoIcons.calendar,
+                    color: Colors.green,
+                  ),
+                  title: const Text('حسب التاريخ'),
+                  onTap:
+                      () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (_) => const OrdersResultPage(filterType: 'date'),
+                        ),
+                      ),
+                ),
+                ListTile(
+                  leading: const Icon(
+                    CupertinoIcons.search,
+                    color: Colors.green,
+                  ),
+                  title: const Text('بحث'),
+                  onTap:
+                      () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (_) =>
+                                  const OrdersResultPage(filterType: 'search'),
+                        ),
+                      ),
+                ),
               ],
             ),
           ],
