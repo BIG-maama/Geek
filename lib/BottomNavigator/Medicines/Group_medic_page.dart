@@ -4,7 +4,6 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pro/BottomNavigator/Medicines/medic_&_catg_info.dart';
 import 'package:pro/BottomNavigator/Medicines/medicine_details.dart';
 import 'package:pro/BottomNavigator/Medicines/show_alternative_medic.dart';
-import 'package:pro/widget/Global.dart';
 
 class GroupedMedicinesCupertinoPage extends StatefulWidget {
   final CategoryInfo category;

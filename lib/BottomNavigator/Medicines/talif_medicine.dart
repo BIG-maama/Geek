@@ -48,9 +48,6 @@ class _DamagedMedicinesPageState extends State<DamagedMedicinesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final Brightness brightness = MediaQuery.of(context).platformBrightness;
-    final bool isDark = brightness == Brightness.dark;
-
     final backgroundColor = CupertinoDynamicColor.withBrightness(
       color: CupertinoColors.systemGroupedBackground,
       darkColor: CupertinoColors.black,

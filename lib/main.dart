@@ -4,6 +4,7 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pro/BottomNavigator/Medicines/medic_&_catg_info.dart';
 import 'package:pro/BottomNavigator/Suppliers/supplier_profile.dart';
+import 'package:pro/BottomNavigator/inventory/hive_inventory.dart';
 import 'package:pro/widget/splash_screen.dart';
 
 void main() async {
@@ -14,8 +15,12 @@ void main() async {
   Hive.registerAdapter(PricesAdapter());
   Hive.registerAdapter(CategoryAdapter());
   Hive.registerAdapter(MedicineFormAdapter());
+  Hive.registerAdapter(AttachmentAdapter());
   Hive.registerAdapter(StatusAdapter());
   Hive.registerAdapter(MedicInfoAdapter());
+  Hive.registerAdapter(InventoryCountAdapter());
+  Hive.registerAdapter(InventoryItemAdapter());
+  Hive.registerAdapter(MedicineAdapter());
   await Hive.openBox<SupplierProfile>('suppliers');
   await Hive.openBox<CategoryInfo>('categorys');
   //await Hive.deleteBoxFromDisk('medics');

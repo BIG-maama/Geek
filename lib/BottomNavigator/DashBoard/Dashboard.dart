@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart'; // تحتاج تضيفها في pubspec.yaml
 import 'package:percent_indicator/percent_indicator.dart'; // رسم المخططات الدائرية
 
-class Dashboard extends StatefulWidget {
-  const Dashboard({Key? key}) : super(key: key);
+class dashboard extends StatefulWidget {
+  const dashboard({Key? key}) : super(key: key);
   @override
-  State<Dashboard> createState() => _Dashboard();
+  State<dashboard> createState() => _Dashboard();
 }
 
-class _Dashboard extends State<Dashboard> with SingleTickerProviderStateMixin {
+class _Dashboard extends State<dashboard> with SingleTickerProviderStateMixin {
   final List<Map<String, dynamic>> inventoryCounts = [
     {
       "id": 4,

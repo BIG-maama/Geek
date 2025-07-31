@@ -126,6 +126,37 @@ class Status {
   }
 }
 
+@HiveType(typeId: 17)
+class Attachment extends HiveObject {
+  @HiveField(0)
+  final int id;
+
+  @HiveField(1)
+  final String fileName;
+
+  @HiveField(2)
+  final String filePath;
+
+  @HiveField(3)
+  final String fullUrl;
+
+  Attachment({
+    required this.id,
+    required this.fileName,
+    required this.filePath,
+    required this.fullUrl,
+  });
+
+  factory Attachment.fromJson(Map<String, dynamic> json) {
+    return Attachment(
+      id: json['id'],
+      fileName: json['file_name'],
+      filePath: json['file_path'],
+      fullUrl: json['full_url'],
+    );
+  }
+}
+
 @HiveType(typeId: 7)
 class MedicInfo extends HiveObject {
   @HiveField(0)
@@ -150,7 +181,7 @@ class MedicInfo extends HiveObject {
   int id;
 
   @HiveField(8)
-  List<dynamic> attachments;
+  List<Attachment> attachments;
 
   @HiveField(9)
   Prices prices;
@@ -190,7 +221,11 @@ class MedicInfo extends HiveObject {
       quantity: medicine['quantity']?.toString() ?? '0',
       alertQuantity: medicine['alert_quantity']?.toString() ?? '0',
       id: medicine['id'] ?? 0,
-      attachments: json['attachments'] ?? [],
+      attachments:
+          (json['attachments'] as List<dynamic>?)
+              ?.map((item) => Attachment.fromJson(item))
+              .toList() ??
+          [],
       prices: Prices.fromJson(medicine['prices'] ?? {}),
       category: Category.fromJson(medicine['category'] ?? {}),
       medicineForm: MedicineForm.fromJson(medicine['medicine_form'] ?? {}),
@@ -198,44 +233,3 @@ class MedicInfo extends HiveObject {
     );
   }
 }
-
-
-
-
-// {
-//     "status": true,
-//     "status_code": 200,
-//     "medicine": {
-//         "id": 1,
-//         "name": "hhslhhv",
-//         "scientific_name": null,
-//         "arabic_name": "fgfgdgdhhhuu",
-//         "barcode": "12121212",
-//         "type": "unit",
-//         "quantity": "12",
-//         "alert_quantity": "4",
-//         "prices": {
-//             "supplier_price": "44",
-//             "people_price": "22",
-//             "tax_rate": "3"
-//         },
-//         "expiry_date": null,
-//         "category": {
-//             "id": 1,
-//             "name": "مسكنات"
-//         },
-//         "medicine_form": {
-//             "id": 1,
-//             "name": "ji",
-//             "description": "اقراص"
-//         },
-//         "status": {
-//             "is_low": false,
-//             "is_out": false,
-//             "is_expired": true,
-//             "is_expiring_soon": false
-//         }
-//     },
-//     "attachments": [],
-//     "message": "تم إضافة الدواء والمرفقات بنجاح"
-// }

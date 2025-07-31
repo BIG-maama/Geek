@@ -209,6 +209,49 @@ class StatusAdapter extends TypeAdapter<Status> {
           typeId == other.typeId;
 }
 
+class AttachmentAdapter extends TypeAdapter<Attachment> {
+  @override
+  final int typeId = 17;
+
+  @override
+  Attachment read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return Attachment(
+      id: fields[0] as int,
+      fileName: fields[1] as String,
+      filePath: fields[2] as String,
+      fullUrl: fields[3] as String,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, Attachment obj) {
+    writer
+      ..writeByte(4)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.fileName)
+      ..writeByte(2)
+      ..write(obj.filePath)
+      ..writeByte(3)
+      ..write(obj.fullUrl);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AttachmentAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
 class MedicInfoAdapter extends TypeAdapter<MedicInfo> {
   @override
   final int typeId = 7;
@@ -227,7 +270,7 @@ class MedicInfoAdapter extends TypeAdapter<MedicInfo> {
       quantity: fields[4] as String,
       alertQuantity: fields[5] as String,
       id: fields[7] as int,
-      attachments: (fields[8] as List).cast<dynamic>(),
+      attachments: (fields[8] as List).cast<Attachment>(),
       prices: fields[9] as Prices,
       category: fields[10] as Category,
       medicineForm: fields[11] as MedicineForm,

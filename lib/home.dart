@@ -1,18 +1,24 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pro/BottomNavigator/DashBoard/Dashboard.dart';
+import 'package:flutter_tilt/flutter_tilt.dart';
+import 'package:pro/BottomNavigator/dashBoard/dashboard.dart';
 import 'package:pro/BottomNavigator/Medicines/Medicines.dart';
 import 'package:pro/BottomNavigator/Medicines/brands-shape_medic/Brand_med.dart';
 import 'package:pro/BottomNavigator/Medicines/brands-shape_medic/Shape_med.dart';
 import 'package:pro/BottomNavigator/Medicines/talif_medicine.dart';
 import 'package:pro/BottomNavigator/Suppliers/Suppliers.dart';
+import 'package:pro/BottomNavigator/inventory/show_all_inventory.dart';
 import 'package:pro/BottomNavigator/orders/show_order_filter.dart';
 import 'package:pro/BottomNavigator/orders/show_order_page.dart';
 import 'package:pro/Permission/user_permission.dart';
 import 'package:pro/Roles/users.dart';
 import 'package:pro/cubit/user_cubit.dart';
+import 'package:pro/widget/Global.dart';
 import 'package:pro/widget/qr_code.dart';
+import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
 class King extends StatefulWidget {
   const King({Key? key}) : super(key: key);
@@ -21,92 +27,194 @@ class King extends StatefulWidget {
 }
 
 class _KingState extends State<King> {
-  late CupertinoTabController _tabController;
+  late ShakeDetectorService _shakeService;
+  int _selectedIndex = 2;
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  Future<void> _fetchAndShowMedicineInfo(
+    BuildContext context,
+    String barCode,
+  ) async {
+    final dio = Dio();
+    final url = '$baseUrl/api/show-damaged-medicine';
+
+    try {
+      final response = await dio.get(
+        url,
+        queryParameters: {'bar_code': barCode},
+      );
+      print(response.data);
+      if (response.statusCode == 200) {
+        final data = response.data;
+
+        if (data['status'] == 'success' && data['medicine'] != null) {
+          final med = data['medicine'];
+
+          final createdAt = med['created_at']?.split('T')[0] ?? '—';
+
+          showCupertinoDialog(
+            context: context,
+            builder:
+                (_) => CupertinoAlertDialog(
+                  title: Text(
+                    med['medicine_name'] ?? 'اسم غير معروف',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  content: Padding(
+                    padding: const EdgeInsets.only(top: 12.0),
+                    child: Column(
+                      children: [
+                        _infoRow("الباركود", med['bar_code']),
+                        _infoRow("النوع", med['type']),
+                        _infoRow("الكمية", med['quantity'].toString()),
+                        _infoRow(
+                          "حد التنبيه",
+                          med['alert_quantity'].toString(),
+                        ),
+                        _infoRow("سعر البيع", "${med['people_price']} د.ع"),
+                        _infoRow("سعر المورد", "${med['supplier_price']} د.ع"),
+                        _infoRow("الضريبة", "${med['tax_rate']}%"),
+                        _infoRow("تاريخ الإنشاء", createdAt),
+                      ],
+                    ),
+                  ),
+                  actions: [
+                    CupertinoDialogAction(
+                      child: const Text("موافق"),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
+                ),
+          );
+        } else {
+          _showErrorDialog(context, 'لم يتم العثور على بيانات للدواء.');
+        }
+      } else {
+        _showErrorDialog(
+          context,
+          'فشل في تحميل البيانات (${response.statusCode}).',
+        );
+      }
+    } catch (e) {
+      _showErrorDialog(context, 'تعذر الاتصال بالخادم:\n${e.toString()}');
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    _tabController = CupertinoTabController(initialIndex: 2);
+    _shakeService = ShakeDetectorService(
+      onShake: () {
+        _showActionSheet(context);
+      },
+    );
+    _shakeService.start();
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    _shakeService.stop();
     super.dispose();
   }
 
+  List<Widget> pages = [
+    const dashboard(),
+    const Medicines_Category_page(),
+    const SuppliersPage(),
+    OrdersScreen(),
+    const All_inventory(),
+  ];
+
   @override
   Widget build(BuildContext context) {
-    return CupertinoTabScaffold(
-      controller: _tabController,
-      tabBar: CupertinoTabBar(
-        backgroundColor: CupertinoColors.systemGrey6,
-        activeColor: CupertinoColors.activeGreen,
-        inactiveColor: CupertinoColors.systemGrey,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.square_grid_2x2),
-            label: 'Dashboard',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.capsule),
-            label: 'Medicines',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.person_2_square_stack),
-            label: 'Suppliers',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.cart),
-            label: 'Orders',
-          ),
-        ],
-      ),
-      tabBuilder: (context, index) {
-        late final Widget page;
+    return BlocProvider.value(
+      value: BlocProvider.of<UserCubit>(context),
+      child: Scaffold(
+        key: _scaffoldKey,
+        drawer: _buildDrawer(),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 1,
+          automaticallyImplyLeading: false,
+          title: Tilt(
+            tiltConfig: TiltConfig(
+              angle:
+                  CupertinoScrollbar
+                      .defaultThicknessWhileDragging, // زاوية الميل القصوى
+              moveDuration: Duration(milliseconds: 100),
+              leaveDuration: Duration(milliseconds: 300),
+              enableGestureTouch: true,
+              enableGestureSensors: true,
+              enableReverse: false,
+              sensorFactor: 0.1,
+            ),
 
-        switch (index) {
-          case 0:
-            page = const Dashboard();
-            break;
-          case 1:
-            page = const Medicines_Category_page();
-            break;
-          case 2:
-            page = const SuppliersPage();
-            break;
-          case 3:
-            page = OrdersScreen();
-            break;
-        }
-        final GlobalKey<ScaffoldState> localScaffoldKey =
-            GlobalKey<ScaffoldState>();
-        return CupertinoTabView(
-          builder: (context) {
-            return BlocProvider.value(
-              value: BlocProvider.of<UserCubit>(context),
-              child: Scaffold(
-                key: localScaffoldKey,
-                drawer: _buildDrawer(),
-                body: CupertinoPageScaffold(
-                  navigationBar: CupertinoNavigationBar(
-                    middle: Text(_tabTitle(index)),
-                    leading: GestureDetector(
-                      onTap: () => localScaffoldKey.currentState?.openDrawer(),
-                      child: const Icon(CupertinoIcons.settings),
-                    ),
-                    trailing: GestureDetector(
-                      onTap: () => _showActionSheet(context),
-                      child: const Icon(CupertinoIcons.ellipsis_vertical),
-                    ),
+            child: AnimatedTextKit(
+              animatedTexts: [
+                TyperAnimatedText(
+                  _tabTitle(_selectedIndex),
+                  textStyle: const TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
-                  child: SafeArea(child: page),
+                  speed: Duration(milliseconds: 100),
                 ),
+              ],
+              totalRepeatCount: 1,
+              pause: Duration(milliseconds: 1000),
+              displayFullTextOnTap: true,
+              stopPauseOnTap: true,
+            ),
+          ),
+          leading: IconButton(
+            icon: const Icon(CupertinoIcons.settings, color: Colors.black),
+            onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(
+                CupertinoIcons.ellipsis_vertical,
+                color: Colors.black,
               ),
-            );
-          },
-        );
-      },
+              onPressed: () => _showActionSheet(context),
+            ),
+          ],
+        ),
+        body: pages[_selectedIndex],
+        bottomNavigationBar: SalomonBottomBar(
+          currentIndex: _selectedIndex,
+          onTap: (i) => setState(() => _selectedIndex = i),
+          items: [
+            SalomonBottomBarItem(
+              icon: const Icon(CupertinoIcons.square_grid_2x2),
+              title: const Text("Dashboard"),
+              selectedColor: CupertinoColors.activeGreen,
+            ),
+            SalomonBottomBarItem(
+              icon: const Icon(CupertinoIcons.capsule),
+              title: const Text("Medicines"),
+              selectedColor: CupertinoColors.activeGreen,
+            ),
+            SalomonBottomBarItem(
+              icon: const Icon(CupertinoIcons.person_2_square_stack),
+              title: const Text("Suppliers"),
+              selectedColor: CupertinoColors.activeGreen,
+            ),
+            SalomonBottomBarItem(
+              icon: const Icon(CupertinoIcons.cart),
+              title: const Text("Orders"),
+              selectedColor: CupertinoColors.activeGreen,
+            ),
+            SalomonBottomBarItem(
+              icon: const Icon(CupertinoIcons.square_grid_2x2),
+              title: const Text("Inventory"),
+              selectedColor: CupertinoColors.activeGreen,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -278,6 +386,7 @@ class _KingState extends State<King> {
                 // CustomIOSDropdown(),
               ],
             ),
+            SizedBox(height: 20),
             _buildExpandableTile(
               icon: CupertinoIcons.square_list,
               title: 'طلبات',
@@ -444,6 +553,8 @@ class _KingState extends State<King> {
         return 'Suppliers';
       case 3:
         return 'Orders';
+      case 4:
+        return 'showAllInventory';
       default:
         return '';
     }
@@ -467,13 +578,19 @@ class _KingState extends State<King> {
               actions: [
                 CupertinoActionSheetAction(
                   onPressed: () {
-                    Navigator.pop(context);
+                    // Navigator.pop(context);
                     Navigator.of(context).push(
                       CupertinoPageRoute(
                         builder:
                             (_) => QRScannerPage(
-                              onCodeScanned: (code) {
-                                _showMedicineInfoDialog(context, code);
+                              onCodeScanned: (code) async {
+                                //  Navigator.pop(context);
+                                Future.microtask(() async {
+                                  await _fetchAndShowMedicineInfo(
+                                    context,
+                                    code,
+                                  );
+                                });
                               },
                             ),
                       ),
@@ -495,20 +612,36 @@ class _KingState extends State<King> {
     );
   }
 
-  void _showMedicineInfoDialog(BuildContext context, String code) {
-    showCupertinoDialog(
-      context: context,
-      builder:
-          (_) => CupertinoAlertDialog(
-            title: const Text("معلومات الدواء"),
-            content: Text("تم مسح الكود بنجاح: $code"),
-            actions: [
-              CupertinoDialogAction(
-                child: const Text("تم"),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ],
+  Widget _infoRow(String label, String? value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text("$label:", style: const TextStyle(fontWeight: FontWeight.w600)),
+          Text(
+            value ?? '—',
+            style: const TextStyle(color: CupertinoColors.systemGrey),
           ),
+        ],
+      ),
     );
   }
+}
+
+void _showErrorDialog(BuildContext context, String message) {
+  showCupertinoDialog(
+    context: context,
+    builder:
+        (_) => CupertinoAlertDialog(
+          title: const Text("خطأ"),
+          content: Text(message),
+          actions: [
+            CupertinoDialogAction(
+              child: const Text("موافق"),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+  );
 }
