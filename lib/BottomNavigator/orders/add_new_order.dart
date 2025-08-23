@@ -16,7 +16,7 @@ class _AddNewOrderState extends State<AddNewOrder> {
   DateTime _orderDate = DateTime.now();
   int? _selectedSupplierId;
 
-  List<SupplierProfile> _suppliers = [];
+  List<Supplier> _suppliers = [];
   List<MedicInfo> _medicines = [];
   List<Map<String, dynamic>> _selectedItems = [];
 
@@ -28,7 +28,7 @@ class _AddNewOrderState extends State<AddNewOrder> {
   }
 
   void _loadSuppliers() {
-    final box = Hive.box<SupplierProfile>('suppliers');
+    final box = Hive.box<Supplier>('suppliers');
     setState(() {
       _suppliers = box.values.toList();
     });
@@ -126,7 +126,7 @@ class _AddNewOrderState extends State<AddNewOrder> {
                     .map(
                       (s) => DropdownMenuItem<int>(
                         value: s.id,
-                        child: Text(s.company_name),
+                        child: Text(s.companyName),
                       ),
                     )
                     .toList(),

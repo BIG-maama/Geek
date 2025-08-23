@@ -1,205 +1,331 @@
-import 'package:bot_toast/bot_toast.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:dio/dio.dart';
+import 'package:hive/hive.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:pro/BottomNavigator/Suppliers/addNewSuppplier.dart';
 import 'package:pro/BottomNavigator/Suppliers/supplier_info.dart';
+import 'package:pro/BottomNavigator/Suppliers/supplier_profile.dart';
+import 'package:pro/BottomNavigator/Suppliers/supplier_purchase.dart';
 import 'package:pro/widget/Global.dart';
-import 'supplier_profile.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
-class SuppliersPage extends StatelessWidget {
-  const SuppliersPage({super.key});
+class SupplierScreen extends StatefulWidget {
+  @override
+  State<SupplierScreen> createState() => _SupplierScreenState();
+}
 
-  Future<Map<String, dynamic>?> fetchSupplierDetails(int supplierId) async {
-    try {
-      final response = await Dio().get(
-        "$baseUrl/api/show-supplier-details/$supplierId",
-      );
-
-      if (response.statusCode == 200 && response.data['status'] == true) {
-        return response.data['data'];
-      } else {
-        print("خطأ في البيانات: ${response.data['message']}");
-        return null;
-      }
-    } catch (e) {
-      print("حدث خطأ أثناء الاتصال بالـ API: $e");
-      return null;
-    }
-  }
-
-  Future<void> deleteSupplier(int ID) async {
-    final response = await Dio().delete('$baseUrl/api/suppliers/$ID');
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      final data = response.data;
-      BotToast.showText(
-        text: (data['message'] as String?) ?? 'تم الحذف بنجاح',
-
-        duration: Duration(seconds: 2),
-        contentColor: Colors.teal,
-      );
-    }
-  }
+class _SupplierScreenState extends State<SupplierScreen> {
+  bool isLoading = true;
+  List<Supplier> suppliers = [];
+  Set<int> _tappedItems = {};
 
   @override
-  Widget build(BuildContext context) {
-    final box = Hive.box<SupplierProfile>('suppliers');
+  void initState() {
+    super.initState();
+    _fetchSuppliers();
+  }
 
-    return Scaffold(
-      appBar: AppBar(title: const Text("قائمة الموردين")),
-      body: ValueListenableBuilder(
-        valueListenable: box.listenable(),
-        builder: (context, Box<SupplierProfile> box, _) {
-          if (box.isEmpty) {
-            return const Center(child: Text("لا يوجد موردين حالياً"));
-          }
+  Future<void> _fetchSuppliers() async {
+    setState(() => isLoading = true);
 
-          return ListView.builder(
-            itemCount: box.length,
-            itemBuilder: (context, index) {
-              final supplier = box.getAt(index)!;
+    final box = Hive.box<Supplier>('suppliers');
 
-              return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  border: Border.all(color: Colors.teal.shade200),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ExpansionTile(
-                  title: Text(
-                    supplier.company_name,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+    try {
+      final response = await Dio().get('$baseUrl/api/suppliers');
+
+      if (response.statusCode == 200) {
+        if (response.data is Map && response.data.containsKey('data')) {
+          final List<dynamic> rawList = response.data['data'];
+
+          final List<Supplier> fetchedSuppliers =
+              rawList.map((e) => Supplier.fromJson(e)).toList();
+
+          // 🗑️ امسح القديم من Hive وخزن الجديد
+          await box.clear();
+          await box.addAll(fetchedSuppliers);
+
+          setState(() {
+            suppliers = fetchedSuppliers;
+            isLoading = false;
+          });
+          return;
+        }
+      }
+
+      // في حال الريسبونس مو صحيح → جيب من Hive
+      setState(() {
+        suppliers = box.values.toList();
+        isLoading = false;
+      });
+    } catch (e) {
+      // 🚫 إذا ما في إنترنت أو صار خطأ → اعرض البيانات من Hive
+      setState(() {
+        suppliers = box.values.toList();
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _deactivateSupplier(int index) async {
+    final supplier = suppliers[index];
+    try {
+      final response = await Dio().put(
+        '$baseUrl/api/dis-active-supplier/${supplier.id}',
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          suppliers[index] = Supplier(
+            id: supplier.id,
+            companyName: supplier.companyName,
+            contactPersonName: supplier.contactPersonName,
+            phone: supplier.phone,
+            email: supplier.email,
+            isActive: 0,
+            unpaidPurchases: supplier.unpaidPurchases,
+          );
+        });
+        _showSnackBar('🚫 تم تعطيل ${supplier.companyName}', Colors.red);
+      }
+    } catch (e) {
+      _showSnackBar('❌ خطأ في تعطيل المورد', Colors.red);
+    }
+  }
+
+  void _showSnackBar(String message, Color color) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message), backgroundColor: color));
+  }
+
+  Widget _buildSupplierCard(Supplier supplier, int index) {
+    bool isActive = supplier.isActive == 1;
+    bool isTapped = _tappedItems.contains(index);
+
+    return AnimationConfiguration.staggeredList(
+      position: index,
+      duration: const Duration(milliseconds: 500),
+      child: SlideAnimation(
+        verticalOffset: 50.0,
+        child: FadeInAnimation(
+          child: Slidable(
+            direction: Axis.horizontal,
+            key: ValueKey(supplier.id),
+            startActionPane: ActionPane(
+              motion: const DrawerMotion(),
+              children: [
+                if (isActive)
+                  SlidableAction(
+                    onPressed: (_) => _deactivateSupplier(index),
+                    backgroundColor: Colors.red.shade600,
+                    icon: Icons.block,
+                    label: 'تعطيل',
                   ),
-                  subtitle: Text("📞 ${supplier.phone}"),
-                  children: [
-                    _buildDataRow("اسم المسؤول:", supplier.contact_person_name),
-                    _buildDataRow("📧 البريد الإلكتروني:", supplier.email),
-                    _buildDataRow("🏠 العنوان:", supplier.address),
-                    _buildDataRow("💳 طريقة الدفع:", supplier.payment_method),
-                    _buildDataRow(
-                      "💰 حد الائتمان:",
-                      supplier.credit_limit.toString(),
-                    ),
-                    _buildDataRow("📅 التاريخ:", supplier.date),
-                    _buildDataRow("🔢 ID:", supplier.id.toString()),
-                    _buildDataRow(
-                      "✅ الحالة:",
-                      supplier.status ? "نشط" : "غير نشط",
-                    ),
-                    const SizedBox(height: 8),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                SlidableAction(
+                  onPressed: (_) {
+                    Navigator.push(
+                      context,
+                      PageTransition(
+                        type: PageTransitionType.rightToLeft,
+                        child: SupplierScreenDetailes(supplier.id),
+                      ),
+                    );
+                  },
+                  backgroundColor: Colors.blueGrey,
+                  icon: Icons.info_outline,
+                  label: 'التفاصيل',
+                ),
+                SlidableAction(
+                  onPressed: (_) {
+                    Navigator.push(
+                      context,
+                      PageTransition(
+                        type: PageTransitionType.rightToLeft,
+                        child: SupplierPurchasesScreen(supplier.id),
+                      ),
+                    );
+                  },
+                  backgroundColor: Colors.orange,
+                  icon: Icons.shopping_cart,
+                  label: 'المشتريات',
+                ),
+              ],
+            ),
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  if (isTapped) {
+                    _tappedItems.remove(index);
+                  } else {
+                    _tappedItems.add(index);
+                  }
+                });
+              },
+              child: Center(
+                child: Stack(
                       children: [
-                        ElevatedButton.icon(
-                          onPressed: () async {
-                            final data = await fetchSupplierDetails(
-                              supplier.id,
-                            );
-                            if (data != null) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (_) => SupplierDetailsPage(
-                                        supplierData: data,
+                        Card(
+                          color: Colors.white.withOpacity(isActive ? 0.9 : 0.3),
+                          elevation: isActive ? 8 : 2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Container(
+                            width: double.infinity,
+                            child: Padding(
+                              padding: const EdgeInsets.all(14),
+                              child: Opacity(
+                                opacity: isActive ? 1.0 : 0.5,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      "🏢 ${supplier.companyName}",
+                                      textAlign: TextAlign.right,
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color:
+                                            isActive
+                                                ? Colors.black
+                                                : Colors.grey.shade600,
                                       ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      "👤 ${supplier.contactPersonName}",
+                                      textAlign: TextAlign.right,
+                                      style: TextStyle(
+                                        color:
+                                            isActive
+                                                ? Colors.black87
+                                                : Colors.grey.shade600,
+                                      ),
+                                    ),
+                                    Text(
+                                      "📞 ${supplier.phone}",
+                                      textAlign: TextAlign.right,
+                                      style: TextStyle(
+                                        color:
+                                            isActive
+                                                ? Colors.black87
+                                                : Colors.grey.shade600,
+                                      ),
+                                    ),
+                                    Text(
+                                      "✉️ ${supplier.email}",
+                                      textAlign: TextAlign.right,
+                                      style: TextStyle(
+                                        color:
+                                            isActive
+                                                ? Colors.black87
+                                                : Colors.grey.shade600,
+                                      ),
+                                    ),
+                                    Text(
+                                      "📦 المشتريات غير المدفوعة: ${supplier.unpaidPurchases}",
+                                      textAlign: TextAlign.right,
+                                      style: TextStyle(
+                                        color:
+                                            isActive
+                                                ? Colors.black87
+                                                : Colors.grey.shade600,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              );
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text("فشل في تحميل بيانات المورد"),
-                                ),
-                              );
-                            }
-                          },
-                          icon: const Icon(Icons.visibility),
-                          label: const Text("عرض"),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue.shade600,
-                            foregroundColor: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
-                        ElevatedButton.icon(
-                          onPressed: () async {
-                            final confirm = await showDialog<bool>(
-                              context: context,
-                              builder:
-                                  (context) => AlertDialog(
-                                    title: const Text("delete confirmation"),
-                                    content: const Text(
-                                      " are you sure you want to delete this supplier ? ",
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed:
-                                            () => Navigator.pop(context, false),
-                                        child: const Text("إلغاء"),
-                                      ),
-                                      TextButton(
-                                        onPressed:
-                                            () => Navigator.pop(context, true),
-                                        child: const Text("نعم، احذف"),
-                                      ),
-                                    ],
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: Container(
+                                width: 14,
+                                height: 14,
+                                decoration: BoxDecoration(
+                                  color:
+                                      isActive
+                                          ? Colors.green
+                                          : Colors.red.shade300,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 2,
                                   ),
-                            );
-
-                            if (confirm ?? false) {
-                              await deleteSupplier(supplier.id);
-                              await box.deleteAt(index);
-                            }
-                          },
-                          icon: const Icon(Icons.delete),
-                          label: const Text("حذف"),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
-                          ),
+                                ),
+                              )
+                              .animate(
+                                onPlay: (controller) => controller.repeat(),
+                              )
+                              .scaleXY(
+                                begin: 1,
+                                end: isActive ? 1.4 : 1.0,
+                                duration: 800.ms,
+                                curve: Curves.easeInOut,
+                              )
+                              .fadeIn(duration: 300.ms),
                         ),
                       ],
-                    ),
-
-                    const SizedBox(height: 8),
-                  ],
-                ),
-              );
-            },
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const AddSupplierPage()),
-          );
-        },
-        child: const Icon(Icons.add),
-        tooltip: "إضافة مورد جديد",
+                    )
+                    .animate(target: isTapped ? 1 : 0)
+                    .shake(duration: 600.ms, hz: 4)
+                    .scaleXY(end: isTapped ? 1.03 : 1.0),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildDataRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      child: Row(
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body:
+          isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : suppliers.isEmpty
+              ? const Center(child: Text("لا توجد بيانات"))
+              : RefreshIndicator(
+                onRefresh: _fetchSuppliers,
+                child: AnimationLimiter(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(8),
+                    itemCount: suppliers.length,
+                    itemBuilder: (context, index) {
+                      return _buildSupplierCard(suppliers[index], index);
+                    },
+                  ),
+                ),
+              ),
+      floatingActionButton: SpeedDial(
+        icon: Icons.menu,
         children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              label,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
+          SpeedDialChild(
+            child: const Icon(Icons.add, color: Colors.white),
+            backgroundColor: Colors.green,
+            label: 'إضافة مورد',
+            onTap: () {
+              Navigator.push(
+                context,
+                PageTransition(
+                  type: PageTransitionType.leftToRight,
+                  child: AddSupplierPage(),
+                ),
+              );
+            },
           ),
-          Expanded(flex: 3, child: Text(value)),
+          SpeedDialChild(
+            child: const Icon(Icons.refresh, color: Colors.white),
+            backgroundColor: Colors.orange,
+            label: 'تحديث',
+            onTap: _fetchSuppliers,
+          ),
         ],
       ),
     );

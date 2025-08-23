@@ -81,3 +81,33 @@ class BatchModel extends HiveObject {
     'medicine': medicine.toJson(),
   };
 }
+
+@HiveType(typeId: 43)
+class Meta extends HiveObject {
+  @HiveField(0)
+  int currentPage;
+
+  @HiveField(1)
+  int lastPage;
+
+  @HiveField(2)
+  int total;
+
+  Meta({
+    required this.currentPage,
+    required this.lastPage,
+    required this.total,
+  });
+
+  factory Meta.fromJson(Map<String, dynamic> json) {
+    return Meta(
+      currentPage: json['current_page'],
+      lastPage: json['last_page'],
+      total: json['total'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'current_page': currentPage, 'last_page': lastPage, 'total': total};
+  }
+}

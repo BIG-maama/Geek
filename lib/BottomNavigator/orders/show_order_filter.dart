@@ -1,128 +1,3 @@
-// import 'package:flutter/material.dart';
-// import 'package:http/http.dart' as http;
-// import 'dart:convert';
-// import 'package:flutter_animate/flutter_animate.dart';
-// import 'package:pro/widget/Global.dart';
-
-// class OrdersResultPage extends StatefulWidget {
-//   final String filterType;
-//   const OrdersResultPage({super.key, required this.filterType});
-
-//   @override
-//   State<OrdersResultPage> createState() => _OrdersResultPageState();
-// }
-
-// class _OrdersResultPageState extends State<OrdersResultPage> {
-//   List orders = [];
-//   bool loading = true;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     fetchOrders();
-//   }
-
-//   Future<void> fetchOrders() async {
-//     try {
-//       final uri = Uri.parse(buildUriWithFilter(widget.filterType));
-//       final res = await http.get(uri);
-
-//       if (res.statusCode == 200) {
-//         final data = json.decode(res.body);
-//         if (data['status']) {
-//           setState(() {
-//             orders = data['data']['orders']['data'];
-//           });
-//         }
-//       }
-//     } catch (e) {
-//       debugPrint('خطأ في الجلب: $e');
-//     } finally {
-//       setState(() {
-//         loading = false;
-//       });
-//     }
-//   }
-
-//   String buildUriWithFilter(String type) {
-//     const baseUrle = '$baseUrl/api/orders';
-//     switch (type) {
-//       case 'supplier':
-//         return '$baseUrle?supplier_id=1';
-//       case 'status':
-//         return '$baseUrle?status=pending';
-//       case 'date':
-//         return '$baseUrle?date_from=2025-01-01&date_to=2025-07-01';
-//       case 'search':
-//         return '$baseUrle?search=ORD';
-//       default:
-//         return baseUrle;
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final themeColor = Colors.teal;
-
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('الطلبات (${widget.filterType})'),
-//         backgroundColor: themeColor,
-//         foregroundColor: Colors.white,
-//         elevation: 0,
-//       ),
-//       backgroundColor: Colors.grey[100],
-//       body:
-//           loading
-//               ? const Center(child: CircularProgressIndicator())
-//               : orders.isEmpty
-//               ? const Center(
-//                 child: Text(
-//                   'لا يوجد طلبات حالياً',
-//                   style: TextStyle(fontSize: 18, color: Colors.grey),
-//                 ),
-//               ).animate().fadeIn(duration: 500.ms)
-//               : ListView.builder(
-//                 padding: const EdgeInsets.all(12),
-//                 itemCount: orders.length,
-//                 itemBuilder: (_, i) {
-//                   final order = orders[i];
-//                   return Card(
-//                     elevation: 4,
-//                     margin: const EdgeInsets.symmetric(vertical: 10),
-//                     shape: RoundedRectangleBorder(
-//                       borderRadius: BorderRadius.circular(15),
-//                     ),
-//                     color: Colors.white,
-//                     child: ListTile(
-//                       contentPadding: const EdgeInsets.all(16),
-//                       leading: CircleAvatar(
-//                         backgroundColor: themeColor.withOpacity(0.1),
-//                         child: Icon(Icons.receipt_long, color: themeColor),
-//                       ),
-//                       title: Text(
-//                         'طلب رقم: ${order['order_number']}',
-//                         style: const TextStyle(fontWeight: FontWeight.bold),
-//                       ),
-//                       subtitle: Padding(
-//                         padding: const EdgeInsets.only(top: 8.0),
-//                         child: Column(
-//                           crossAxisAlignment: CrossAxisAlignment.start,
-//                           children: [
-//                             Text('المورد: ${order['supplier']['name']}'),
-//                             Text('الحالة: ${order['status']}'),
-//                             Text('التاريخ: ${order['order_date']}'),
-//                             Text('الإجمالي: ${order['total_amount']} د.ع'),
-//                           ],
-//                         ),
-//                       ),
-//                     ),
-//                   ).animate().fadeIn(delay: (i * 100).ms);
-//                 },
-//               ),
-//     );
-//   }
-// }
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -164,10 +39,10 @@ class _OrdersResultPageState extends State<OrdersResultPage> {
   }
 
   Future<void> loadSuppliersFromHive() async {
-    final box = await Hive.openBox<SupplierProfile>('suppliers');
+    final box = await Hive.openBox<Supplier>('suppliers');
     suppliers =
         box.values
-            .map((e) => {'id': e.id, 'name': e.contact_person_name})
+            .map((e) => {'id': e.id, 'name': e.contactPersonName})
             .toList();
   }
 

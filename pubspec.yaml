@@ -84,6 +84,9 @@ dependencies:
   motion_toast: ^2.14.0
   auto_size_text: ^3.0.0
   liquid_pull_to_refresh: ^3.0.1
+  lottie: ^3.3.1
+  permission_handler: ^12.0.1
+  #open_file: ^3.5.10
   
 
 dev_dependencies:
@@ -119,6 +122,7 @@ flutter:
    - images/email2.jpg
    - images/lock (1).jpg
    - assets/frames/
+   - assets/lottie/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

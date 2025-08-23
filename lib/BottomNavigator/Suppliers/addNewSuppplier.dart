@@ -4,6 +4,7 @@ import 'package:fancy_snackbar/fancy_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:pro/BottomNavigator/Suppliers/supplier_profile.dart';
+
 import 'package:pro/widget/Global.dart';
 import 'package:pro/widget/custom_text.dart';
 
@@ -33,16 +34,14 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
           "address": addressController.text,
         },
       );
-      final supplier = SupplierProfile.fromJson(response.data['supplier']);
-      final box = Hive.box<SupplierProfile>('suppliers');
-      await box.add(supplier);
+
       FancySnackbar.show(
         context,
         "success",
         backgroundColor: const Color.fromARGB(255, 5, 15, 5),
         textColor: Colors.white,
       );
-      Navigator.pop(context, supplier);
+      Navigator.pop(context);
     } catch (e) {
       AnimatedSnackBar.material(
         'failed operation!',

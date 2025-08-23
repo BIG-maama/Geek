@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
 import 'package:pro/cubit/user_cubit.dart';
 import 'package:pro/core/api/dio_consumer.dart';
 import 'package:dio/dio.dart';
@@ -12,46 +13,22 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  final int totalFrames = 45;
-
+class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
 
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    );
-
-    _controller.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder:
-                (_) => BlocProvider(
-                  create: (_) => UserCubit(DioConsumer(dio: Dio())),
-                  child: const King(),
-                ),
-          ),
-        );
-      }
+    Future.delayed(const Duration(seconds: 6), () {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder:
+              (_) => BlocProvider(
+                create: (_) => UserCubit(DioConsumer(dio: Dio())),
+                child: const King(),
+              ),
+        ),
+      );
     });
-
-    _controller.forward();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  String getFrameName(int index) {
-    final paddedIndex = index.toString().padLeft(3, '0'); // 000, 001, 002 ...
-    return 'assets/frames/frame_$paddedIndex.png';
   }
 
   @override
@@ -59,13 +36,11 @@ class _SplashScreenState extends State<SplashScreen>
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            int currentFrame = (_controller.value * (totalFrames - 1)).floor();
-            String framePath = getFrameName(currentFrame);
-            return Image.asset(framePath);
-          },
+        child: Lottie.asset(
+          "assets/lottie/Capsule.json",
+          width: 250,
+          height: 250,
+          fit: BoxFit.contain,
         ),
       ),
     );

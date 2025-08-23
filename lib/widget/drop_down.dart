@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:pro/BottomNavigator/Suppliers/supplier_profile.dart';
 
 class CustomIOSDropdown extends StatefulWidget {
-  final List<SupplierProfile> suppliers;
+  final List<Supplier> suppliers;
   final Function(int) onSelected;
-  final SupplierProfile? selectedSupplier;
+  final Supplier? selectedSupplier;
 
   const CustomIOSDropdown({
     Key? key,
@@ -20,7 +20,7 @@ class CustomIOSDropdown extends StatefulWidget {
 
 class _CustomIOSDropdownState extends State<CustomIOSDropdown>
     with SingleTickerProviderStateMixin {
-  late SupplierProfile selectedValue;
+  late Supplier selectedValue;
 
   late AnimationController _animationController;
   late Animation<Offset> _offsetAnimation;
@@ -34,17 +34,19 @@ class _CustomIOSDropdownState extends State<CustomIOSDropdown>
         widget.selectedSupplier ??
         (widget.suppliers.isNotEmpty
             ? widget.suppliers[0]
-            : SupplierProfile(
+            : Supplier(
               id: 0,
-              company_name: 'لا يوجد مورد',
-              contact_person_name: '',
+              companyName: 'لا يوجد مورد',
+              contactPersonName: '',
               phone: '',
               email: '',
-              address: '',
-              payment_method: '',
-              credit_limit: 0,
-              date: '',
-              status: false,
+              isActive: 0,
+              unpaidPurchases: 0,
+              // address: '',
+              // payment_method: '',
+              // credit_limit: 0,
+              // date: '',
+              // status: false,
             ));
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.onSelected(selectedValue.id);
@@ -129,7 +131,7 @@ class _CustomIOSDropdownState extends State<CustomIOSDropdown>
                               .map(
                                 (option) => Center(
                                   child: Text(
-                                    option.company_name,
+                                    option.companyName,
                                     style: const TextStyle(fontSize: 18),
                                   ),
                                 ),
@@ -193,7 +195,7 @@ class _CustomIOSDropdownState extends State<CustomIOSDropdown>
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              selectedValue.company_name,
+              selectedValue.companyName,
               style: const TextStyle(
                 fontSize: 16,
                 color: CupertinoColors.black,

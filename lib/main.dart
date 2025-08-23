@@ -4,20 +4,21 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pro/BottomNavigator/Medicines/medic_&_catg_info.dart';
 import 'package:pro/BottomNavigator/Suppliers/supplier_profile.dart';
+import 'package:pro/BottomNavigator/Suppliers/supplier_purchase.dart';
 import 'package:pro/BottomNavigator/inventory/hive_inventory.dart';
-import 'package:pro/batches/All_batches.dart';
 import 'package:pro/batches/hive_save.dart';
+import 'package:pro/invoices/all_invocies.dart';
+import 'package:pro/invoices/invocies_pro.dart';
+import 'package:pro/widget/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-  Hive.registerAdapter(SupplierProfileAdapter());
   Hive.registerAdapter(CategoryInfoAdapter());
   Hive.registerAdapter(PricesAdapter());
   Hive.registerAdapter(CategoryAdapter());
   Hive.registerAdapter(MedicineModelAdapter());
   Hive.registerAdapter(BatchModelAdapter());
-
   Hive.registerAdapter(MedicineFormAdapter());
   Hive.registerAdapter(AttachmentAdapter());
   Hive.registerAdapter(StatusAdapter());
@@ -25,11 +26,16 @@ void main() async {
   Hive.registerAdapter(InventoryCountAdapter());
   Hive.registerAdapter(InventoryItemAdapter());
   Hive.registerAdapter(MedicineAdapter());
-  await Hive.openBox<SupplierProfile>('suppliers');
+  Hive.registerAdapter(MetaAdapter());
+  Hive.registerAdapter(SupplierAdapter());
+  Hive.registerAdapter(InvoiceAdapter());
+  Hive.registerAdapter(MedicineItemAdapter());
+  await Hive.openBox<Invoice>('invoices');
+  await Hive.openBox<Supplier>('suppliers');
   await Hive.openBox<CategoryInfo>('categorys');
-  //await Hive.deleteBoxFromDisk('medics');
   await Hive.openBox<MedicInfo>('medics');
   await Hive.openBox<BatchModel>('batches');
+  await Hive.openBox<Meta>('meta');
   runApp(MyApp());
 }
 
@@ -43,7 +49,7 @@ class MyApp extends StatelessWidget {
       navigatorObservers: [BotToastNavigatorObserver()],
       title: 'Flutter App',
       theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'Almarai'),
-      home: MedicineScreen(),
+      home: SplashScreen(),
       // home: BlocProvider(
       //   create: (_) => UserCubit(DioConsumer(dio: Dio())),
       //   child: King(),

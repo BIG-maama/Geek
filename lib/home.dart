@@ -15,7 +15,12 @@ import 'package:pro/BottomNavigator/orders/show_order_filter.dart';
 import 'package:pro/BottomNavigator/orders/show_order_page.dart';
 import 'package:pro/Permission/user_permission.dart';
 import 'package:pro/Roles/users.dart';
+import 'package:pro/batches/All_batches.dart';
 import 'package:pro/cubit/user_cubit.dart';
+import 'package:pro/invoices/all_invocies.dart';
+import 'package:pro/invoices/paid_invocies.dart';
+import 'package:pro/invoices/partilly_paid_invocies.dart';
+import 'package:pro/invoices/unpaid_invoices.dart';
 import 'package:pro/widget/Global.dart';
 import 'package:pro/widget/qr_code.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
@@ -121,7 +126,7 @@ class _KingState extends State<King> {
   List<Widget> pages = [
     const dashboard(),
     const Medicines_Category_page(),
-    const SuppliersPage(),
+    SupplierScreen(),
     OrdersScreen(),
     const All_inventory(),
   ];
@@ -354,6 +359,32 @@ class _KingState extends State<King> {
               ),
             ),
             SizedBox(height: 20),
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.green.shade50.withOpacity(0.4),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.green.shade100.withOpacity(0.5),
+                    blurRadius: 6,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: _buildIOSDrawerItem(
+                icon: CupertinoIcons.bandage_fill,
+                text: ' جميع الدفعات ',
+                iconColor: Colors.green.shade700,
+                textColor: Colors.green.shade900,
+                onTap: () {
+                  Navigator.of(
+                    context,
+                  ).push(CupertinoPageRoute(builder: (_) => MedicineScreen()));
+                },
+              ),
+            ),
+            SizedBox(height: 20),
             _buildExpandableTile(
               icon: CupertinoIcons.paperclip,
               title: 'إدارة الفواتير',
@@ -363,10 +394,10 @@ class _KingState extends State<King> {
                     CupertinoIcons.person_2_fill,
                     color: Colors.green,
                   ),
-                  title: Text('المستخدمين'),
+                  title: Text('عرض جميع الفواتير'),
                   onTap: () {
                     Navigator.of(context).push(
-                      CupertinoPageRoute(builder: (_) => UserManagementPage()),
+                      CupertinoPageRoute(builder: (_) => InvoicesScreen()),
                     );
                   },
                 ),
@@ -375,10 +406,36 @@ class _KingState extends State<King> {
                     CupertinoIcons.lock_shield_fill,
                     color: Colors.green,
                   ),
-                  title: Text('الصلاحيات'),
+                  title: Text('الفواتير الغير مدفوعة '),
                   onTap: () {
                     Navigator.of(context).push(
-                      CupertinoPageRoute(builder: (_) => User_Permission()),
+                      CupertinoPageRoute(builder: (_) => UnpaidInvoicesPage()),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: Icon(
+                    CupertinoIcons.lock_shield_fill,
+                    color: Colors.green,
+                  ),
+                  title: Text('الفواتير  المدفوعة جزئيا'),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      CupertinoPageRoute(
+                        builder: (_) => Paid_Partilly_InvoicesPage(),
+                      ),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: Icon(
+                    CupertinoIcons.sort_up_circle,
+                    color: Colors.green,
+                  ),
+                  title: Text('الفواتير  المدفوعة '),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      CupertinoPageRoute(builder: (_) => PaidInvoicesPage()),
                     );
                   },
                 ),
